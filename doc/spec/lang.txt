@@ -1,0 +1,34 @@
+ident-char := ident-start | digit.
+
+ident-start := '_' | letter.
+
+ident := ident-start {ident-char}.
+
+signed-integer := ('+' | '-') integer.
+
+integer := digit {digit}.
+
+letter := 'A' | ... | 'Z' | 'a' | ... | 'z'.
+
+digit := '0' | ... | '9'.
+
+name-decl := 'VAR' ident [type-spec] [const-expr].
+
+type-decl := 'TYPE' ident type-spec.
+
+size := digit {digit}.
+
+type-spec := 'INT'
+           | 'FLOAT'
+           | 'CHAR'
+           | 'BOOL'
+           | 'PTR' type-spec
+           | 'GENERIC'
+           | 'ARRAY' size type-spec
+           | 'RECORD' [type-spec] [field-list].
+
+field := ident type-spec.
+
+field-list := field {',' field}.
+
+The GENERIC type is equivalent to void*, aka. a generic address

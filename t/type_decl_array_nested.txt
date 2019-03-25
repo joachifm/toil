@@ -1,0 +1,1 @@
+TYPE tilemap ARRAY 10 ARRAY 20 CHAR

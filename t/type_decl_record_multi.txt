@@ -1,0 +1,3 @@
+TYPE person RECORD
+  name ARRAY 10 CHAR
+  age INT
