@@ -1,5 +1,4 @@
-CC = gcc
-CFLAGS := -pipe -Ofast -g -std=c99 -Wall
+CC = cc
 
 .PHONY: all
 all: c
