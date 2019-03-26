@@ -22,6 +22,7 @@
 #define IDENT_BUF_SIZE (IDENT_MAX_LEN + 1)
 
 struct field_list; /* forward */
+struct param_list; /* forward */
 struct symtab; /* forward */
 struct type; /* forward */
 
@@ -31,6 +32,12 @@ enum {
     KLASS_TYPE,
     KLASS_VAR,
     MAX_KLASS, /* for bounds checking */
+};
+
+struct param_list {
+    char name[IDENT_BUF_SIZE];
+    struct type* type;
+    struct param_list* prev;
 };
 
 struct symtab {
@@ -45,6 +52,13 @@ struct symtab {
 
         /* when KLASS_CONST */
         struct { long valu; } constant;
+
+        /* when KLASS_FUNC */
+        struct {
+            struct type* rettype;
+            size_t arity;
+            struct param_list* params;
+        } func;
 
         /* when KLASS_VAR */
         struct {
@@ -571,8 +585,74 @@ static bool ConstDecl(void) {
     return true;
 }
 
+static bool FuncDecl(void) {
+    if (looksym != FUNC) {
+        return false;
+    }
+    getsym(); // consumed 'FUNC'
+
+    if (looksym != IDENT) {
+        fprintf(stderr, "fatal: expected ident\n");
+        exit(1);
+    }
+    char funcnam[IDENT_BUF_SIZE];
+    strcpy(funcnam, ident);
+    getsym(); // consumed ident
+
+    size_t arity = 0;
+    struct param_list* params = 0;
+
+    if (looksym == LPAREN) {
+        getsym(); // consumed '('
+        do {
+            if (looksym != IDENT) {
+                fprintf(stderr, "fatal: expected param identifier\n");
+                exit(1);
+            }
+            char paramnam[IDENT_BUF_SIZE];
+            strcpy(paramnam, ident);
+            getsym(); // consumed ident
+
+            struct type* type = 0;
+            if (!TypeSpec(&type)) {
+                fprintf(stderr, "fatal: expected type-spec\n");
+                exit(1);
+            }
+
+            struct param_list* newparam = emalloc(sizeof(*newparam));
+            *newparam = (struct param_list){};
+            strcpy(newparam->name, paramnam);
+            newparam->type = type;
+
+            ++arity;
+        } while (looksym != RPAREN);
+        getsym(); // consumed ')'
+    }
+
+    struct type* rettype = 0;
+    if (!TypeSpec(&rettype)) {
+        fprintf(stderr, "fatal: expected type-spec\n");
+        exit(1);
+    }
+
+    struct symtab* newfunc = intern(funcnam, KLASS_FUNC);
+    newfunc->func.arity = arity;
+    newfunc->func.params = params;
+    newfunc->func.rettype = rettype;
+
+    // TODO body
+
+    if (looksym != END) {
+        fprintf(stderr, "fatal: expected 'END'\n");
+        exit(1);
+    }
+    getsym(); // consumed 'END'
+
+    return true;
+}
+
 static bool Decl(void) {
-    return ConstDecl() || VarDecl() || TypeDecl();
+    return ConstDecl() || FuncDecl() || VarDecl() || TypeDecl();
 }
 
 int main(int argc, char** argv) {
