@@ -182,7 +182,7 @@ static struct type builtin_type_int = (struct type){.klass = TYPE_INT};
 
 static struct symtab* symtab_last;
 
-static struct symtab* intern(char const* name, int const klass) {
+static struct symtab* intern(char const* name, unsigned const klass) {
     assert(name);
     assert(klass > 0 && klass < MAX_KLASS);
 
@@ -417,7 +417,11 @@ static bool TypeSpec(struct type** spec) {
                 fprintf(stderr, "fatal: expected const\n");
                 exit(1);
             }
-            len = found->constant.valu;
+            if (found->constant.valu < 0) {
+                fprintf(stderr, "fatal: expected positive integer\n");
+                exit(1);
+            }
+            len = (size_t)found->constant.valu;
         } else if (!Size(&len)) {
             fprintf(stderr, "fatal: expected positive integer\n");
             exit(1);
