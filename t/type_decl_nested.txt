@@ -1,0 +1,3 @@
+TYPE color_range INT
+TYPE color_rgb RECORD blue color_range red color_range green color_range
+TYPE person RECORD eyes color_rgb

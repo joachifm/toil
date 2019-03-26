@@ -1,0 +1,2 @@
+CONST nameLen 10
+TYPE name ARRAY nameLen CHAR
