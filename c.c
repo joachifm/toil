@@ -41,11 +41,12 @@ struct param_list {
 };
 
 struct symtab {
-    unsigned klass;
     struct symtab* prev;
     char name[IDENT_BUF_SIZE];
 
     /* Variant fields */
+    unsigned klass;
+
     union {
         /* when KLASS_TYPE */
         struct { struct type* spec; } type;
@@ -79,7 +80,7 @@ enum {
 };
 
 struct type {
-    unsigned klass;
+    unsigned kind;
 
     /* Variant fields */
     union {
@@ -176,9 +177,9 @@ static char ident[IDENT_MAX_LEN]; // Token value when looksym == IDENT
 static size_t ident_len; // Number of chars read into ident
 static long number; // Token value when LIT_INT
 
-static struct type builtin_type_bool = (struct type){.klass = TYPE_BOOL};
-static struct type builtin_type_char = (struct type){.klass = TYPE_CHAR};
-static struct type builtin_type_int = (struct type){.klass = TYPE_INT};
+static struct type builtin_type_bool = (struct type){.kind = TYPE_BOOL};
+static struct type builtin_type_char = (struct type){.kind = TYPE_CHAR};
+static struct type builtin_type_int = (struct type){.kind = TYPE_INT};
 
 static struct symtab* symtab_last;
 
@@ -221,7 +222,7 @@ static void describe_type(int ind, struct type const* spec) {
 
     indent(ind); printf("TYPE\n");
     indent(ind); printf("klass: ");
-    switch (spec->klass) {
+    switch (spec->kind) {
     case TYPE_BOOL:
         printf("BOOL\n");
         break;
@@ -435,7 +436,7 @@ static bool TypeSpec(struct type** spec) {
 
         struct type* newtyp = emalloc(sizeof(*newtyp));
         *newtyp = (struct type){
-            .klass = TYPE_ARRAY,
+            .kind = TYPE_ARRAY,
             .array.len = len,
             .array.base = base,
         };
@@ -453,7 +454,7 @@ static bool TypeSpec(struct type** spec) {
 
         struct type* newtyp = emalloc(sizeof(*newtyp));
         *newtyp = (struct type){
-            .klass = TYPE_POINTER,
+            .kind = TYPE_POINTER,
             .pointer.base = base,
         };
         *spec = newtyp;
@@ -495,7 +496,7 @@ static bool TypeSpec(struct type** spec) {
 
         struct type* newtyp = emalloc(sizeof(*newtyp));
         *newtyp = (struct type){
-            .klass = TYPE_RECORD,
+            .kind = TYPE_RECORD,
             .record.base = base,
             .record.fields = fields,
         };
