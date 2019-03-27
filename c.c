@@ -21,10 +21,9 @@
 /* Size of buffer holding identifier, including trailing NUL. */
 #define IDENT_BUF_SIZE (IDENT_MAX_LEN + 1)
 
-struct field_list; /* forward */
-struct param_list; /* forward */
 struct symtab; /* forward */
 struct type; /* forward */
+struct binds;
 
 enum {
     KLASS_CONST = 1, /* 0 is unset */
@@ -34,10 +33,10 @@ enum {
     MAX_KLASS, /* for bounds checking */
 };
 
-struct param_list {
+struct binds {
     char name[IDENT_BUF_SIZE];
     struct type* type;
-    struct param_list* prev;
+    struct binds* prev;
 };
 
 struct symtab {
@@ -58,7 +57,7 @@ struct symtab {
         struct {
             struct type* rettype;
             size_t arity;
-            struct param_list* params;
+            struct binds* params;
         } func;
 
         /* when KLASS_VAR */
@@ -98,15 +97,9 @@ struct type {
         /* when TYPE_RECORD */
         struct {
             struct type* base;
-            struct field_list* fields;
+            struct binds* fields;
         } record;
     };
-};
-
-struct field_list {
-    char name[IDENT_BUF_SIZE];
-    struct type* type;
-    struct field_list* prev;
 };
 
 /* Token classes */
@@ -251,7 +244,7 @@ static void describe_type(int ind, struct type const* spec) {
         }
         if (spec->record.fields) {
             indent(ind); printf("fields:\n");
-            for (struct field_list* f = spec->record.fields; f; f = f->prev) {
+            for (struct binds* f = spec->record.fields; f; f = f->prev) {
                 indent(ind); printf("name: %s\n", f->name);
                 describe_type(ind + 1, f->type);
             }
@@ -477,14 +470,14 @@ static bool TypeSpec(struct type** spec) {
             getsym(); // consumed ')'
         }
 
-        struct field_list* fields = 0;
+        struct binds* fields = 0;
         while (1) {
             if (looksym != IDENT) {
                 break;
             }
 
-            struct field_list* newfield = emalloc(sizeof(*newfield));
-            *newfield = (struct field_list){.prev = fields};
+            struct binds* newfield = emalloc(sizeof(*newfield));
+            *newfield = (struct binds){.prev = fields};
             strcpy(newfield->name, ident);
             getsym(); // consumed ident
             if (!TypeSpec(&newfield->type)) {
@@ -605,7 +598,7 @@ static bool FuncDecl(void) {
     getsym(); // consumed ident
 
     size_t arity = 0;
-    struct param_list* params = 0;
+    struct binds* params = 0;
 
     if (looksym == LPAREN) {
         getsym(); // consumed '('
@@ -624,8 +617,8 @@ static bool FuncDecl(void) {
                 exit(1);
             }
 
-            struct param_list* newparam = emalloc(sizeof(*newparam));
-            *newparam = (struct param_list){};
+            struct binds* newparam = emalloc(sizeof(*newparam));
+            *newparam = (struct binds){};
             strcpy(newparam->name, paramnam);
             newparam->type = type;
 
