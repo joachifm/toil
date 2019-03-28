@@ -5,15 +5,13 @@
 #include "aux.h"
 #include "lex.h"
 
-/* Private state */
-static int lookch; // Input char lookahead
-
-/* Public state */
-int looksym;
+int looksym = 0;
 int numbase = 10;
 long numval = 0;
 char ident[IDENT_MAX_LEN];
-size_t ident_len;
+size_t ident_len = 0;
+
+static int lookch; /* Input char lookahead */
 
 static int accept_char(int ch) {
     if (lookch == ch) {
