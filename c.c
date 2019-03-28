@@ -283,11 +283,13 @@ static bool TypeSpec(struct type** spec) {
             if (looksym != IDENT) {
                 break;
             }
+            char fieldnam[IDENT_BUF_SIZE];
+            strcpy(fieldnam, ident);
+            lex_getsym(); // consumed ident
 
             struct binds* newfield = emalloc(sizeof(*newfield));
             *newfield = (struct binds){.prev = fields};
-            strcpy(newfield->name, ident);
-            lex_getsym(); // consumed ident
+            strcpy(newfield->name, fieldnam);
             if (!TypeSpec(&newfield->type)) {
                 fprintf(stderr, "fatal: expected type-spec\n");
                 exit(1);
