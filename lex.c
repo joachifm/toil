@@ -11,7 +11,7 @@ static int lookch; // Input char lookahead
 /* Public state */
 int looksym;
 int numbase = 10;
-long number;
+long numval = 0;
 char ident[IDENT_MAX_LEN];
 size_t ident_len;
 
@@ -37,7 +37,7 @@ int lex_getsym() {
         do { ds[i++] = lookch; lookch = getchar(); }
         while (i < DIGIT_BUF_SIZE - 1 && isdigit(lookch));
         ds[i] = '\0';
-        number = strtol(ds, 0, numbase);
+        numval = strtol(ds, 0, numbase);
         looksym = LIT_INT;
     } else if (isalpha(lookch)) {
         ident_len = 0;

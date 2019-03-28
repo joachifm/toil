@@ -174,7 +174,7 @@ static bool ConstExpr(long* out) {
     assert(out);
 
     if (looksym == LIT_INT) {
-        *out = number;
+        *out = numval;
         lex_getsym(); // consumed number
         return true;
     } else if (looksym == IDENT) {

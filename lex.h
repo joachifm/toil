@@ -79,6 +79,6 @@ int lex_getsym(void);
 
 extern int looksym; /* Class of last scanned token */
 extern int numbase; /* Current number base */
-extern long number; /* Token value when LIT_INT */
+extern long numval; /* Token value when LIT_INT */
 extern char ident[IDENT_MAX_LEN]; /* Token value when IDENT */
 extern size_t ident_len; /* Number of chars read into ident */
