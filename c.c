@@ -18,10 +18,44 @@ enum {
     MAX_KLASS, /* for bounds checking */
 };
 
+enum {
+    TYPE_BOOL = 1, /* 0 is "unset" */
+    TYPE_CHAR,
+    TYPE_INT,
+    TYPE_ARRAY,
+    TYPE_POINTER,
+    TYPE_RECORD,
+    MAX_TYPE, /* for bounds checking */
+};
+
 struct binds {
     char name[IDENT_BUF_SIZE];
     struct type* type;
     struct binds* prev;
+};
+
+struct type {
+    unsigned kind;
+
+    /* Variant fields */
+    union {
+        /* when TYPE_ARRAY */
+        struct {
+            struct type* base;
+            size_t len;
+        } array;
+
+        /* when TYPE_POINTER */
+        struct {
+            struct type* base;
+        } pointer;
+
+        /* when TYPE_RECORD */
+        struct {
+            struct type* base;
+            struct binds* fields;
+        } record;
+    };
 };
 
 struct symtab {
@@ -50,40 +84,6 @@ struct symtab {
             struct type* type;
             /*long addr;*/
         } var;
-    };
-};
-
-enum {
-    TYPE_BOOL = 1, /* 0 is "unset" */
-    TYPE_CHAR,
-    TYPE_INT,
-    TYPE_ARRAY,
-    TYPE_POINTER,
-    TYPE_RECORD,
-    MAX_TYPE, /* for bounds checking */
-};
-
-struct type {
-    unsigned kind;
-
-    /* Variant fields */
-    union {
-        /* when TYPE_ARRAY */
-        struct {
-            struct type* base;
-            size_t len;
-        } array;
-
-        /* when TYPE_POINTER */
-        struct {
-            struct type* base;
-        } pointer;
-
-        /* when TYPE_RECORD */
-        struct {
-            struct type* base;
-            struct binds* fields;
-        } record;
     };
 };
 
