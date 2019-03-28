@@ -170,15 +170,25 @@ static void describe_type(int ind, struct type const* spec) {
     }
 }
 
-static bool Size(size_t* out) {
+static bool ConstExpr(long* out) {
     assert(out);
 
-    if (looksym != LIT_INT || number < 0) {
+    if (looksym == LIT_INT) {
+        *out = number;
+        lex_getsym(); // consumed number
+        return true;
+    } else if (looksym == IDENT) {
+        struct symtab* found = resolve(ident, KLASS_CONST);
+        if (found) {
+            lex_getsym(); // consumed ident
+            *out = found->constant.valu;
+            return true;
+        } else {
+            return false;
+        }
+    } else {
         return false;
     }
-    *out = (size_t)number;
-    lex_getsym(); // consumed number
-    return true;
 }
 
 static bool TypeSpec(struct type** spec) {
@@ -208,26 +218,17 @@ static bool TypeSpec(struct type** spec) {
     } else if (looksym == ARRAY) {
         lex_getsym(); // consumed 'ARRAY'
 
-        // TODO factor as ConstExpr?
-        size_t len = 0;
-        if (looksym == IDENT) {
-            char constnam[IDENT_BUF_SIZE];
-            strcpy(constnam, ident);
-            lex_getsym(); // consumed ident
-            struct symtab* found = resolve(constnam, KLASS_CONST);
-            if (!found) {
-                fprintf(stderr, "fatal: expected const\n");
-                exit(1);
-            }
-            if (found->constant.valu < 0) {
-                fprintf(stderr, "fatal: expected positive integer\n");
-                exit(1);
-            }
-            len = (size_t)found->constant.valu;
-        } else if (!Size(&len)) {
+        long lenval = 0;
+        if (!ConstExpr(&lenval)) {
+            fprintf(stderr, "fatal: expected const-expr\n");
+            exit(1);
+        }
+        if (lenval < 0) {
             fprintf(stderr, "fatal: expected positive integer\n");
             exit(1);
         }
+
+        size_t len = (size_t)lenval;
 
         struct type* base = 0;
         if (!TypeSpec(&base)) {
@@ -380,12 +381,11 @@ static bool ConstDecl(void) {
     strcpy(constnam, ident);
     lex_getsym(); // consumed ident
 
-    if (looksym != LIT_INT) {
+    long expr = 0;
+    if (!ConstExpr(&expr)) {
         fprintf(stderr, "fatal: expected const-expr\n");
         exit(1);
     }
-    long expr = number;
-    lex_getsym(); // consumed const-expr
 
     struct symtab* binds = intern(constnam, KLASS_CONST);
     binds->constant.valu = expr;
