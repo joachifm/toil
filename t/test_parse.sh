@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 testlog=$(mktemp)
-for x in ./func_decl_*.txt ; do
+for x in ./*.txt ; do
     name=$(basename "$x" .txt)
     echo -n "running test: $name ... " >&2
     tcc -run ../c.c < "$x" &> "$testlog"

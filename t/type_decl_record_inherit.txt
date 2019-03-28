@@ -1,0 +1,3 @@
+TYPE shape RECORD
+TYPE circle RECORD (shape)
+  radius INT
