@@ -52,6 +52,8 @@ enum {
     UNTIL,
     WHILE,
     DO,
+
+    BEGIN,
     END,
 
     MODULE,

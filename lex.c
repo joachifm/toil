@@ -60,6 +60,8 @@ int lex_getsym() {
             STREQ(ident, "UNTIL") ? UNTIL :
             STREQ(ident, "WHILE") ? WHILE :
             STREQ(ident, "DO") ? DO :
+
+            STREQ(ident, "BEGIN") ? BEGIN :
             STREQ(ident, "END") ? END :
 
             STREQ(ident, "ARRAY") ? ARRAY :
