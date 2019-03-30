@@ -99,26 +99,20 @@ static size_t type_size_of(struct type const* spec) {
     switch (spec->kind) {
     case TYPE_BOOL:
         return 1;
-        break;
     case TYPE_CHAR:
         return 1;
-        break;
     case TYPE_INT:
         return sizeof(int);
-        break;
     case TYPE_ARRAY:
         return type_size_of(spec->array.base) * spec->array.len;
-        break;
     case TYPE_POINTER:
         return sizeof(void*);
-        break;
     case TYPE_RECORD: {
         size_t total = spec->record.base ? type_size_of(spec->record.base) : 0;
         for (struct binds* fld = spec->record.fields; fld; fld = fld->prev) {
             total += type_size_of(fld->type);
         }
         return total;
-        break;
     }
     }
 
