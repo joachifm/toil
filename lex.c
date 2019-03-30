@@ -32,14 +32,14 @@ int lex_getsym() {
     if (isdigit(lookch)) {
         char ds[DIGIT_BUF_SIZE];
         size_t i = 0;
-        do { ds[i++] = lookch; lookch = getchar(); }
+        do { ds[i++] = (char)lookch; lookch = getchar(); }
         while (i < DIGIT_BUF_SIZE - 1 && isdigit(lookch));
         ds[i] = '\0';
         numval = strtol(ds, 0, numbase);
         looksym = LIT_INT;
     } else if (isalpha(lookch)) {
         ident_len = 0;
-        do { ident[ident_len++] = lookch; lookch = getchar(); }
+        do { ident[ident_len++] = (char)lookch; lookch = getchar(); }
         while (ident_len < IDENT_BUF_SIZE - 1 && (isalnum(lookch) || lookch == '_'));
         ident[ident_len] = '\0';
         looksym =
