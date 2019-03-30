@@ -227,7 +227,7 @@ static bool TypeSpec(struct type** spec) {
     assert(spec);
 
     if (looksym == IDENT) { // typid
-        char typid[IDENT_BUF_SIZE];
+        char typid[IDENT_BUF_SIZE] = {0};
         strcpy(typid, ident);
         lex_getsym(); // consumed ident
 
@@ -316,7 +316,7 @@ static bool TypeSpec(struct type** spec) {
             if (looksym != IDENT) {
                 break;
             }
-            char fieldnam[IDENT_BUF_SIZE];
+            char fieldnam[IDENT_BUF_SIZE] = {0};
             strcpy(fieldnam, ident);
             lex_getsym(); // consumed ident
 
@@ -355,7 +355,7 @@ static bool TypeDecl(void) {
         return false;
     }
 
-    char typnam[IDENT_BUF_SIZE];
+    char typnam[IDENT_BUF_SIZE] = {0};
     strcpy(typnam, ident);
     lex_getsym(); // consumed ident
 
@@ -384,7 +384,7 @@ static bool VarDecl(void) {
         fprintf(stderr, "fatal: expected identifier\n");
         exit(1);
     }
-    char varnam[IDENT_BUF_SIZE];
+    char varnam[IDENT_BUF_SIZE] = {0};
     strcpy(varnam, ident);
     lex_getsym(); // consumed ident
 
@@ -410,7 +410,7 @@ static bool ConstDecl(void) {
         fprintf(stderr, "fatal: expected ident\n");
         exit(1);
     }
-    char constnam[IDENT_BUF_SIZE];
+    char constnam[IDENT_BUF_SIZE] = {0};
     strcpy(constnam, ident);
     lex_getsym(); // consumed ident
 
@@ -436,7 +436,7 @@ static bool FuncDecl(void) {
         fprintf(stderr, "fatal: expected ident\n");
         exit(1);
     }
-    char funcnam[IDENT_BUF_SIZE];
+    char funcnam[IDENT_BUF_SIZE] = {0};
     strcpy(funcnam, ident);
     lex_getsym(); // consumed ident
 
@@ -450,7 +450,7 @@ static bool FuncDecl(void) {
                 fprintf(stderr, "fatal: expected param identifier\n");
                 exit(1);
             }
-            char paramnam[IDENT_BUF_SIZE];
+            char paramnam[IDENT_BUF_SIZE] = {0};
             strcpy(paramnam, ident);
             lex_getsym(); // consumed ident
 
