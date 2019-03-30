@@ -90,7 +90,19 @@ int lex_getsym() {
     } else if (accept_char('.')) {
         looksym = PERIOD;
     } else if (accept_char('=')) {
-        looksym = EQUAL;
+        looksym = EQ;
+    } else if (accept_char('>')) {
+        if (accept_char('=')) {
+            looksym = GTE;
+        } else {
+            looksym = GT;
+        }
+    } else if (accept_char('<')) {
+        if (accept_char('=')) {
+            looksym = LTE;
+        } else {
+            looksym = LT;
+        }
     } else if (accept_char(':')) {
         if (accept_char('=')) {
             looksym = ASSIGN;

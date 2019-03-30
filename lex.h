@@ -31,7 +31,11 @@ enum {
     RECORD,
     POINTER,
 
-    EQUAL,
+    EQ,
+    LT,
+    GT,
+    LTE,
+    GTE,
 
     AND,
     NOT,
