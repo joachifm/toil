@@ -74,11 +74,14 @@ enum {
     RPAREN,
 };
 
+/* Initialize the lexer state. */
 void lex_init(void);
+
+/* Get the next token from the input stream. */
 int lex_getsym(void);
 
 extern int looksym; /* Class of last scanned token */
 extern int numbase; /* Current number base */
-extern long numval; /* Token value when LIT_INT */
-extern char ident[IDENT_MAX_LEN]; /* Token value when IDENT */
+extern long numval; /* Value of LIT_INT */
+extern char ident[IDENT_MAX_LEN]; /* Value of IDENT */
 extern size_t ident_len; /* Number of chars read into ident */
