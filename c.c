@@ -6,9 +6,10 @@
 #include "aux.h"
 #include "lex.h"
 
+struct binds; /* forward */
+struct item; /* forward */
 struct symtab; /* forward */
 struct type; /* forward */
-struct binds;
 
 enum {
     KLASS_CONST = 1, /* 0 is unset */
@@ -359,11 +360,11 @@ static bool TypeDecl(void) {
         exit(1);
     }
 
-    struct symtab* binds = intern(typnam, KLASS_TYPE);
-    binds->type.spec = typspec;
+    struct symtab* bound = intern(typnam, KLASS_TYPE);
+    bound->type.spec = typspec;
 
-    describe_type(1, binds->type.spec);
-    printf("size of type: %zd\n", type_size_of(binds->type.spec));
+    describe_type(1, bound->type.spec);
+    printf("size of type: %zd\n", type_size_of(bound->type.spec));
 
     return true;
 }
@@ -388,8 +389,8 @@ static bool VarDecl(void) {
         exit(1);
     }
 
-    struct symtab* binds = intern(varnam, KLASS_VAR);
-    binds->var.type = thetype;
+    struct symtab* bound = intern(varnam, KLASS_VAR);
+    bound->var.type = thetype;
 
     return true;
 }
@@ -414,8 +415,8 @@ static bool ConstDecl(void) {
         exit(1);
     }
 
-    struct symtab* binds = intern(constnam, KLASS_CONST);
-    binds->constant.valu = expr;
+    struct symtab* bound = intern(constnam, KLASS_CONST);
+    bound->constant.valu = expr;
 
     return true;
 }
