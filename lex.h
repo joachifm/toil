@@ -78,6 +78,8 @@ enum {
 
     LPAREN,
     RPAREN,
+
+    MAX_TOKEN, /* for bounds checking */
 };
 
 /* Initialize the lexer state. */
