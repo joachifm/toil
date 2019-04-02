@@ -197,22 +197,58 @@ static void describe_type(int ind, struct type const* spec) {
     }
 }
 
+/* Accept a nullary terminal symbol.  The lookahead is advanced iff it matches.
+ *
+ * @param  sym the symbol to match
+ * @return true if matched, false otherwise
+ */
+static bool Accept(int sym) {
+    assert(sym > 0 && sym < MAX_TOKEN);
+    if (looksym != sym) {
+        return false;
+    }
+    lex_getsym();
+    return true;
+}
+
+/* Accept any identifier.  If current symbol is an identifier, the identifier
+ * name is copied into the supplied buffer and lookahead is advanced.
+ */
+static bool Identifier(char* out) {
+    assert(out);
+    if (looksym != IDENT) {
+        return false;
+    }
+    strncpy(out, ident, IDENT_MAX_LEN);
+    lex_getsym();
+    return true;
+}
+
+/* Accept any number.  If current symbol is a number, it is copied
+ * to the supplied buffer and lookahead is advanced.
+ */
+static bool Number(long* out) {
+    assert(out);
+    if (looksym != LIT_INT) {
+        return false;
+    }
+    *out = numval;
+    lex_getsym();
+    return true;
+}
+
 static bool ConstExpr(long* out) {
     assert(out);
 
-    if (looksym == LIT_INT) {
-        *out = numval;
-        lex_getsym(); // consumed number
+    char varname[IDENT_BUF_SIZE];
+    if (Number(out)) {
         return true;
-    } else if (looksym == IDENT) {
-        struct symtab* found = resolve(ident, KLASS_CONST);
-        if (found) {
-            lex_getsym(); // consumed ident
-            *out = found->constant.valu;
-            return true;
-        } else {
+    } else if (Identifier(varname)) {
+        struct symtab* found = resolve(varname, KLASS_CONST);
+        if (!found)
             return false;
-        }
+        *out = found->constant.valu;
+        return true;
     } else {
         return false;
     }
@@ -221,11 +257,8 @@ static bool ConstExpr(long* out) {
 static bool TypeSpec(struct type** spec) {
     assert(spec);
 
-    if (looksym == IDENT) { // typid
-        char typid[IDENT_BUF_SIZE] = {0};
-        strcpy(typid, ident);
-        lex_getsym(); // consumed ident
-
+    char typid[IDENT_BUF_SIZE];
+    if (Identifier(typid)) {
         if (STREQ(typid, "BOOL")) {
             *spec = &builtin_type_bool;
         } else if (STREQ(typid, "CHAR")) {
@@ -240,11 +273,8 @@ static bool TypeSpec(struct type** spec) {
             }
             *spec = found->type.spec;
         }
-
         return true;
-    } else if (looksym == ARRAY) {
-        lex_getsym(); // consumed 'ARRAY'
-
+    } else if (Accept(ARRAY)) {
         long lenval = 0;
         if (!ConstExpr(&lenval)) {
             fprintf(stderr, "fatal: expected const-expr\n");
@@ -255,8 +285,6 @@ static bool TypeSpec(struct type** spec) {
             exit(1);
         }
 
-        size_t len = (size_t)lenval;
-
         struct type* base = 0;
         if (!TypeSpec(&base)) {
             fprintf(stderr, "fatal: expected type-spec\n");
@@ -266,15 +294,13 @@ static bool TypeSpec(struct type** spec) {
         struct type* newtyp = emalloc(sizeof(*newtyp));
         *newtyp = (struct type){
             .kind = TYPE_ARRAY,
-            .array.len = len,
+            .array.len = (size_t)lenval,
             .array.base = base,
         };
         *spec = newtyp;
 
         return true;
-    } else if (looksym == POINTER) {
-        lex_getsym(); // consumed 'POINTER'
-
+    } else if (Accept(POINTER)) {
         struct type* base = 0;
         if (!TypeSpec(&base)) {
             fprintf(stderr, "fatal: expected type-spec\n");
@@ -289,31 +315,24 @@ static bool TypeSpec(struct type** spec) {
         *spec = newtyp;
 
         return true;
-    } else if (looksym == RECORD) {
-        lex_getsym(); // consumed 'RECORD'
-
+    } else if (Accept(RECORD)) {
         struct type* base = 0;
-        if (looksym == LPAREN) {
-            lex_getsym(); // consumed '('
+        if (Accept(LPAREN)) {
             if (!TypeSpec(&base)) {
                 fprintf(stderr, "fatal: expected type-spec\n");
                 exit(1);
             }
-            if (looksym != RPAREN) {
+            if (!Accept(RPAREN)) {
                 fprintf(stderr, "fatal: expected closing paren\n");
                 exit(1);
             }
-            lex_getsym(); // consumed ')'
         }
 
         struct binds* fields = 0;
         while (1) {
-            if (looksym != IDENT) {
-                break;
-            }
             char fieldnam[IDENT_BUF_SIZE] = {0};
-            strcpy(fieldnam, ident);
-            lex_getsym(); // consumed ident
+            if (!Identifier(fieldnam))
+                break;
 
             struct binds* newfield = emalloc(sizeof(*newfield));
             *newfield = (struct binds){.prev = fields};
@@ -340,19 +359,14 @@ static bool TypeSpec(struct type** spec) {
 }
 
 static bool TypeDecl(void) {
-    if (looksym != TYPE) {
+    if (!Accept(TYPE))
         return false;
-    }
-    lex_getsym(); // consumed 'TYPE'
-
-    if (looksym != IDENT) {
-        fprintf(stderr, "fatal: expected type name\n");
-        return false;
-    }
 
     char typnam[IDENT_BUF_SIZE] = {0};
-    strcpy(typnam, ident);
-    lex_getsym(); // consumed ident
+    if (!Identifier(typnam)) {
+        fprintf(stderr, "fatal: expected type name\n");
+        exit(0);
+    }
 
     struct type* typspec = 0;
     if (!TypeSpec(&typspec)) {
@@ -370,18 +384,14 @@ static bool TypeDecl(void) {
 }
 
 static bool VarDecl(void) {
-    if (looksym != VAR) {
+    if (!Accept(VAR))
         return false;
-    }
-    lex_getsym(); // consumed 'VAR'
 
-    if (looksym != IDENT) {
+    char varnam[IDENT_BUF_SIZE] = {0};
+    if (!Identifier(varnam)) {
         fprintf(stderr, "fatal: expected identifier\n");
         exit(1);
     }
-    char varnam[IDENT_BUF_SIZE] = {0};
-    strcpy(varnam, ident);
-    lex_getsym(); // consumed ident
 
     struct type* thetype = 0;
     if (!TypeSpec(&thetype)) {
@@ -396,18 +406,14 @@ static bool VarDecl(void) {
 }
 
 static bool ConstDecl(void) {
-    if (looksym != CONST) {
+    if (!Accept(CONST))
         return false;
-    }
-    lex_getsym(); // consumed 'CONST'
 
-    if (looksym != IDENT) {
+    char constnam[IDENT_BUF_SIZE] = {0};
+    if (!Identifier(constnam)) {
         fprintf(stderr, "fatal: expected ident\n");
         exit(1);
     }
-    char constnam[IDENT_BUF_SIZE] = {0};
-    strcpy(constnam, ident);
-    lex_getsym(); // consumed ident
 
     long expr = 0;
     if (!ConstExpr(&expr)) {
@@ -422,32 +428,25 @@ static bool ConstDecl(void) {
 }
 
 static bool FuncDecl(void) {
-    if (looksym != FUNC) {
+    if (!Accept(FUNC))
         return false;
-    }
-    lex_getsym(); // consumed 'FUNC'
 
-    if (looksym != IDENT) {
+    char funcnam[IDENT_BUF_SIZE] = {0};
+    if (!Identifier(funcnam)) {
         fprintf(stderr, "fatal: expected ident\n");
         exit(1);
     }
-    char funcnam[IDENT_BUF_SIZE] = {0};
-    strcpy(funcnam, ident);
-    lex_getsym(); // consumed ident
 
     size_t arity = 0;
     struct binds* params = 0;
 
-    if (looksym == LPAREN) {
-        lex_getsym(); // consumed '('
+    if (Accept(LPAREN)) {
         do {
-            if (looksym != IDENT) {
+            char paramnam[IDENT_BUF_SIZE] = {0};
+            if (!Accept(IDENT)) {
                 fprintf(stderr, "fatal: expected param identifier\n");
                 exit(1);
             }
-            char paramnam[IDENT_BUF_SIZE] = {0};
-            strcpy(paramnam, ident);
-            lex_getsym(); // consumed ident
 
             struct type* type = 0;
             if (!TypeSpec(&type)) {
@@ -478,11 +477,10 @@ static bool FuncDecl(void) {
 
     // TODO body
 
-    if (looksym != END) {
+    if (!Accept(END)) {
         fprintf(stderr, "fatal: expected 'END'\n");
         exit(1);
     }
-    lex_getsym(); // consumed 'END'
 
     return true;
 }
@@ -493,6 +491,7 @@ static bool Decl(void) {
 
 int main(int argc, char** argv) {
     lex_init();
+
     while (Decl());
     return 0;
 }
