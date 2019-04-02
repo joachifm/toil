@@ -6,7 +6,7 @@
 #define DIGIT_MAX 4
 
 /* The maximum number of characters in an identifier. */
-#define IDENT_MAX_LEN 31
+#define IDENT_MAX_LEN ((size_t)31)
 
 /* Size of buffer holding digits, including trailing NUL. */
 #define DIGIT_BUF_SIZE (DIGIT_MAX + 1)
