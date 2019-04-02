@@ -82,6 +82,9 @@ enum {
     MAX_TOKEN, /* for bounds checking */
 };
 
+/* Token aliases */
+#define MUL STAR
+
 /* Initialize the lexer state. */
 void lex_init(void);
 
