@@ -59,6 +59,13 @@ struct type {
     };
 };
 
+struct scope; /* forward */
+
+struct scope {
+    struct scope* parent;
+    struct symtab* env;
+};
+
 struct symtab {
     struct symtab* prev;
     char name[IDENT_BUF_SIZE];
@@ -92,7 +99,37 @@ static struct type builtin_type_bool = (struct type){.kind = TYPE_BOOL};
 static struct type builtin_type_char = (struct type){.kind = TYPE_CHAR};
 static struct type builtin_type_int = (struct type){.kind = TYPE_INT};
 
-static struct symtab* symtab_last;
+static struct scope* scope;
+
+static void enter_scope(void) {
+    struct scope* new_scope = emalloc(sizeof(*new_scope));
+    *new_scope = (struct scope){.parent = scope};
+
+    struct symtab* new_env = emalloc(sizeof(*new_env));
+    *new_env = (struct symtab){};
+    new_scope->env = new_env;
+
+    scope = new_scope;
+}
+
+static void leave_scope(void) {
+    puts("leave scope");
+    struct scope* parent = scope->parent;
+
+    struct symtab* env = scope->env;
+    /* TODO leaks memory */
+    while (env) {
+        struct symtab* prev = env->prev; /* save link */
+        *env = (struct symtab){}; /* clear memory */
+        free(env); /* release storage */
+        env = prev; /* next */
+    }
+
+    *scope = (struct scope){};
+    free(scope);
+
+    scope = parent;
+}
 
 static size_t type_size_of(struct type const* spec) {
     assert(spec);
@@ -127,11 +164,11 @@ static struct symtab* intern(char const* name, unsigned const klass) {
     struct symtab* new = emalloc(sizeof(*new));
     *new = (struct symtab){
         .klass = klass,
-        .prev = symtab_last,
+        .prev = scope ? scope->env : 0,
     };
     strcpy(new->name, name);
 
-    symtab_last = new;
+    scope->env = new;
     return new;
 }
 
@@ -140,7 +177,7 @@ static struct symtab* resolve(char const* name, unsigned const klass) {
     assert(klass > 0 && klass < MAX_KLASS);
 
     struct symtab* found = 0;
-    for (found = symtab_last;
+    for (found = scope->env;
          found && !(found->klass == klass && STREQ(found->name, name));
          found = found->prev);
 
@@ -490,8 +527,9 @@ static bool Decl(void) {
 }
 
 int main(int argc, char** argv) {
+    enter_scope();
     lex_init();
-
     while (Decl());
+    leave_scope();
     return 0;
 }
