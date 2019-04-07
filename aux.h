@@ -16,14 +16,10 @@ static void fatal(char const* fmt, ...) {
 }
 
 static void* emalloc(size_t siz) {
-    if (siz < 1) {
-        fprintf(stderr, "refusing to create nullptr\n");
-        exit(1);
-    }
+    if (siz < 1)
+        fatal("emalloc: refusing to create nullptr\n");
     void* p = malloc(siz);
-    if (!p) {
-        fprintf(stderr, "out of memory!\n");
-        exit(1);
-    }
+    if (!p)
+        fatal("emalloc: out of memory!\n");
     return p;
 }
