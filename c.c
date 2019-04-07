@@ -248,6 +248,14 @@ static bool Accept(int sym) {
     return true;
 }
 
+/* A wrapper for Accept() that aborts the program if lookahead fails
+ * to match.
+ */
+static void Expect(int sym) {
+    if (!Accept(sym))
+        fatal("expected %d\n", sym);
+}
+
 /* Accept any identifier.  If current symbol is an identifier, the identifier
  * name is copied into the supplied buffer and lookahead is advanced.
  */
