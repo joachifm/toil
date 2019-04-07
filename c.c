@@ -282,21 +282,23 @@ static bool Number(long* out) {
     return true;
 }
 
-static bool ConstExpr(long* out) {
+static bool ConstVar(long* out) {
     assert(out);
 
-    char varname[IDENT_BUF_SIZE];
-    if (Number(out)) {
-        return true;
-    } else if (Identifier(varname)) {
-        struct symtab* found = resolve(varname, KLASS_CONST);
-        if (!found)
-            return false;
-        *out = found->constant.valu;
-        return true;
-    } else {
+    char varnam[IDENT_BUF_SIZE] = {0};
+    if (!Identifier(varnam))
         return false;
-    }
+
+    struct symtab* found = resolve(varnam, KLASS_CONST);
+    if (!found)
+        fatal("unbound identifier: %s\n", varnam);
+    *out = found->constant.valu;
+    return true;
+}
+
+static bool ConstExpr(long* out) {
+    assert(out);
+    return Number(out) || ConstVar(out);
 }
 
 static bool TypeSpec(struct type** spec) {
