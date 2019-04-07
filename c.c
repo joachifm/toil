@@ -234,6 +234,22 @@ static void describe_type(int ind, struct type const* spec) {
     }
 }
 
+/* The parser is a topdown recursive descent parser with single-lookahead.
+ *
+ * For each nonterminal in the grammer, a corresponding procedure is defined.
+ * The parsing procedure first determines if the current symbol is in the
+ * FIRST set, then continues to consume terminals and call other parsing
+ * functions.
+ *
+ * There is no backtracking: once a parsing procedure has begun consuming
+ * terminals it must either successfully generate a production or abort
+ * the program.
+ *
+ * A parsing procedure returns true to indicate that a production was
+ * generated.  It returns false to indicate that nothing was produced and that
+ * nothing was consumed.
+ */
+
 /* Accept a nullary terminal symbol.  The lookahead is advanced iff it matches.
  *
  * @param  sym the symbol to match
