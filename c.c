@@ -367,10 +367,7 @@ static bool TypeSpec(struct type** spec) {
                 fprintf(stderr, "fatal: expected type-spec\n");
                 exit(1);
             }
-            if (!Accept(RPAREN)) {
-                fprintf(stderr, "fatal: expected closing paren\n");
-                exit(1);
-            }
+            Expect(RPAREN);
         }
 
         struct binds* fields = 0;
@@ -522,10 +519,7 @@ static bool FuncDecl(void) {
 
     // TODO body
 
-    if (!Accept(END)) {
-        fprintf(stderr, "fatal: expected 'END'\n");
-        exit(1);
-    }
+    Expect(END);
 
     return true;
 }
