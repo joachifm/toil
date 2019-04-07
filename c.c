@@ -314,29 +314,21 @@ static bool TypeSpec(struct type** spec) {
             *spec = &builtin_type_int;
         } else {
             struct symtab* found = resolve(typid, KLASS_TYPE);
-            if (!found) {
-                fprintf(stderr, "fatal: unbound type: %s\n", typid);
-                exit(1);
-            }
+            if (!found)
+                fatal("unbound type: %s\n", typid);
             *spec = found->type.spec;
         }
         return true;
     } else if (Accept(ARRAY)) {
         long lenval = 0;
-        if (!ConstExpr(&lenval)) {
-            fprintf(stderr, "fatal: expected const-expr\n");
-            exit(1);
-        }
-        if (lenval < 0) {
-            fprintf(stderr, "fatal: expected positive integer\n");
-            exit(1);
-        }
+        if (!ConstExpr(&lenval))
+            fatal("expected const-expr\n");
+        if (lenval < 0)
+            fatal("expected positive integer\n");
 
         struct type* base = 0;
-        if (!TypeSpec(&base)) {
-            fprintf(stderr, "fatal: expected type-spec\n");
-            exit(1);
-        }
+        if (!TypeSpec(&base))
+            fatal("expected type-spec\n");
 
         struct type* newtyp = emalloc(sizeof(*newtyp));
         *newtyp = (struct type){
@@ -349,10 +341,8 @@ static bool TypeSpec(struct type** spec) {
         return true;
     } else if (Accept(POINTER)) {
         struct type* base = 0;
-        if (!TypeSpec(&base)) {
-            fprintf(stderr, "fatal: expected type-spec\n");
-            exit(1);
-        }
+        if (!TypeSpec(&base))
+            fatal("expected type-spec\n");
 
         struct type* newtyp = emalloc(sizeof(*newtyp));
         *newtyp = (struct type){
@@ -365,10 +355,8 @@ static bool TypeSpec(struct type** spec) {
     } else if (Accept(RECORD)) {
         struct type* base = 0;
         if (Accept(LPAREN)) {
-            if (!TypeSpec(&base)) {
-                fprintf(stderr, "fatal: expected type-spec\n");
-                exit(1);
-            }
+            if (!TypeSpec(&base))
+                fatal("expected type-spec\n");
             Expect(RPAREN);
         }
 
@@ -381,10 +369,8 @@ static bool TypeSpec(struct type** spec) {
             struct binds* newfield = emalloc(sizeof(*newfield));
             *newfield = (struct binds){.prev = fields};
             strcpy(newfield->name, fieldnam);
-            if (!TypeSpec(&newfield->type)) {
-                fprintf(stderr, "fatal: expected type-spec\n");
-                exit(1);
-            }
+            if (!TypeSpec(&newfield->type))
+                fatal("expected type-spec\n");
             fields = newfield;
         }
 
@@ -407,16 +393,12 @@ static bool TypeDecl(void) {
         return false;
 
     char typnam[IDENT_BUF_SIZE] = {0};
-    if (!Identifier(typnam)) {
-        fprintf(stderr, "fatal: expected type name\n");
-        exit(0);
-    }
+    if (!Identifier(typnam))
+        fatal("expected type name\n");
 
     struct type* typspec = 0;
-    if (!TypeSpec(&typspec)) {
-        fprintf(stderr, "fatal: expected type-spec\n");
-        exit(1);
-    }
+    if (!TypeSpec(&typspec))
+        fatal("expected type-spec\n");
 
     struct symtab* bound = intern(typnam, KLASS_TYPE);
     bound->type.spec = typspec;
@@ -432,16 +414,12 @@ static bool VarDecl(void) {
         return false;
 
     char varnam[IDENT_BUF_SIZE] = {0};
-    if (!Identifier(varnam)) {
-        fprintf(stderr, "fatal: expected identifier\n");
-        exit(1);
-    }
+    if (!Identifier(varnam))
+        fatal("expected identifier\n");
 
     struct type* thetype = 0;
-    if (!TypeSpec(&thetype)) {
-        fprintf(stderr, "fatal: expected type-spec\n");
-        exit(1);
-    }
+    if (!TypeSpec(&thetype))
+        fatal("expected type-spec\n");
 
     struct symtab* bound = intern(varnam, KLASS_VAR);
     bound->var.type = thetype;
@@ -454,16 +432,12 @@ static bool ConstDecl(void) {
         return false;
 
     char constnam[IDENT_BUF_SIZE] = {0};
-    if (!Identifier(constnam)) {
-        fprintf(stderr, "fatal: expected ident\n");
-        exit(1);
-    }
+    if (!Identifier(constnam))
+        fatal("expected ident\n");
 
     long expr = 0;
-    if (!ConstExpr(&expr)) {
-        fprintf(stderr, "fatal: expected const-expr\n");
-        exit(1);
-    }
+    if (!ConstExpr(&expr))
+        fatal("expected const-expr\n");
 
     struct symtab* bound = intern(constnam, KLASS_CONST);
     bound->constant.valu = expr;
@@ -476,10 +450,8 @@ static bool FuncDecl(void) {
         return false;
 
     char funcnam[IDENT_BUF_SIZE] = {0};
-    if (!Identifier(funcnam)) {
-        fprintf(stderr, "fatal: expected ident\n");
-        exit(1);
-    }
+    if (!Identifier(funcnam))
+        fatal("expected ident\n");
 
     size_t arity = 0;
     struct binds* params = 0;
@@ -487,16 +459,12 @@ static bool FuncDecl(void) {
     if (Accept(LPAREN)) {
         do {
             char paramnam[IDENT_BUF_SIZE] = {0};
-            if (!Accept(IDENT)) {
-                fprintf(stderr, "fatal: expected param identifier\n");
-                exit(1);
-            }
+            if (!Identifier(paramnam))
+                fatal("expected param identifier\n");
 
             struct type* type = 0;
-            if (!TypeSpec(&type)) {
-                fprintf(stderr, "fatal: expected type-spec\n");
-                exit(1);
-            }
+            if (!TypeSpec(&type))
+                fatal("expected type-spec\n");
 
             struct binds* newparam = emalloc(sizeof(*newparam));
             *newparam = (struct binds){};
@@ -509,10 +477,8 @@ static bool FuncDecl(void) {
     }
 
     struct type* rettype = 0;
-    if (!TypeSpec(&rettype)) {
-        fprintf(stderr, "fatal: expected type-spec\n");
-        exit(1);
-    }
+    if (!TypeSpec(&rettype))
+        fatal("expected type-spec\n");
 
     struct symtab* newfunc = intern(funcnam, KLASS_FUNC);
     newfunc->func.arity = arity;
