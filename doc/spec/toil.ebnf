@@ -1,0 +1,57 @@
+letter = 'A' | ... | 'Z' | 'a' | ... | 'z'.
+
+digit = '0' | ... | '9'.
+
+identifier = letter {ident-char}.
+
+ident-start = '_' | letter.
+
+ident-char = ident-start | digit.
+
+identifier-list = identifier {"," identifier}.
+
+constant-declaration = "CONST" identifier const-expr.
+
+type-declaration = "TYPE" identifier type.
+
+variable-declaration = "VAR" identifier type.
+
+declaration = constant-declaration | type-declaration | variable-declaration.
+
+base-type = "BOOL" | "CHAR" | "INT" | "REAL".
+
+array-type = "ARRAY" array-size type.
+
+array-size = constant | identifier.   ; where identifier is a constant
+
+record-type = "RECORD" ["(" type ")"] record-section-list.
+
+record-section-list = record-section {";" record-section}.
+
+record-section = identifier-list ":" type.
+
+pointer-type = "POINTER" type.
+
+type
+  = identifier
+  | array-type
+  | record-type
+  | pointer-type
+  | "GENERIC".
+
+conditional-statement =
+  "IF" boolean-expression "THEN" compound-statement "ELSE" compound-statement.
+
+while-statement = "WHILE" boolean-expression compound-statement.
+
+repeat-statement = "REPEAT" compound-statement "UNTIL" boolean-expression.
+
+simple-expression = identifier | constant | "(" simple-expression ")"
+
+boolean-expression
+  = boolean-infix-binop
+  | boolean-unop
+  | boolean-literal
+  | identifier  ; where identifier is a boolean constant
+
+boolean-literal = "TRUE" | "FALSE".
