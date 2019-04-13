@@ -3,13 +3,13 @@
 /* The maximum number of digits in a number.  Buffers
  * holding digits must hold at least DIGIT_BUF_SIZE elements.
  */
-#define DIGIT_MAX 4
+#define DIGIT_MAX_LEN 4
 
 /* The maximum number of characters in an identifier. */
 #define IDENT_MAX_LEN ((size_t)31)
 
 /* Size of buffer holding digits, including trailing NUL. */
-#define DIGIT_BUF_SIZE (DIGIT_MAX + 1)
+#define DIGIT_BUF_SIZE (DIGIT_MAX_LEN + 1)
 
 /* Size of buffer holding identifier, including trailing NUL. */
 #define IDENT_BUF_SIZE (IDENT_MAX_LEN + 1)
