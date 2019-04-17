@@ -2,8 +2,6 @@ CC = cc
 CFLAGS += -MMD
 
 .PHONY: all
-all: c
-
-c: c.o lex.o
+all: polish toil
 
 -include *.d
