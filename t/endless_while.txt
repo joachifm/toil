@@ -1,0 +1,7 @@
+PROGRAM while
+
+WHILE 1
+    x := 0
+ENDWHILE
+
+END

@@ -1,0 +1,5 @@
+#! /bin/sh
+set -eu
+./do.sh
+./parser_test > out.s
+gcc out.s

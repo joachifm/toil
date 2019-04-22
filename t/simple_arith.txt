@@ -1,0 +1,5 @@
+PROGRAM foo
+
+x := 2 + 1
+
+END

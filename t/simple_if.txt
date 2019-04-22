@@ -1,0 +1,9 @@
+PROGRAM foo
+
+IF 0
+    x := 2
+ELSE
+    x := 1
+ENDIF
+
+END

@@ -1,0 +1,4 @@
+MODULE testing_1
+
+CONST idlen 10
+TYPE ident ARRAY idlen CHAR

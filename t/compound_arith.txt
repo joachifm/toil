@@ -1,0 +1,9 @@
+PROGRAM arith
+
+IF (0 + 0)
+    x := 1 + (1 + 10)
+ELSE
+    x := 0
+ENDIF
+
+END
