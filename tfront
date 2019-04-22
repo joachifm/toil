@@ -1,5 +1,5 @@
 #! /bin/sh
 set -eu
 ./do.sh
-./parser_test > out.s
+./build/bin/parser_test > out.s
 gcc -g -nostdlib -no-pie out.s
