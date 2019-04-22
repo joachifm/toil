@@ -75,7 +75,7 @@ auto Assignment() {
     scan::get_name(varnam);
     scan::match(':'); scan::match('=');
     Expression();
-    printf("    movl %%eax,varx(%%eip)\n");
+    printf("    movl %%eax,%s(%%eip)\n", varnam);
 }
 
 void Block() {
@@ -94,7 +94,7 @@ auto Program() {
 
     printf("    .data\n");
     printf("banner: .ascii \"Hello\\n\"\n");
-    printf("varx: .int 0\n");
+    printf("x: .int 0\n");
     printf("\n");
 
     printf("    .global _start\n");
