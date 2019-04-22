@@ -1,3 +1,32 @@
 #+TITLE: toil
 
 A toy compiler for a toy language.
+
+* Usage
+
+#+begin_src sh :exports code :results none
+  ./tfront < t/simple_if.txt
+#+end_src
+
+#+begin_src sh :results verbatim :exports results
+  cat out.s
+#+end_src
+
+#+RESULTS:
+#+begin_example
+    .text
+    .globl main
+main:
+    movl $0,%eax
+    test %eax,%eax
+    jz L0
+    movl $2,%eax
+    jmp L1
+L0:
+    movl $1,%eax
+L1:
+
+    movl $60,%eax
+    xorl %edi,%edi
+    syscall
+#+end_example
