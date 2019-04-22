@@ -94,9 +94,11 @@ auto Program() {
     printf("    .data\n");
     printf("banner: .ascii \"Hello\\n\"\n");
     printf("\n");
+
+    printf("    .global _start\n");
     printf("    .text\n");
-    printf("    .globl main\n");
-    printf("main:\n");
+    printf("_start:\n");
+
     printf("    mov $%d,%%eax\n", SYS_write);
     printf("    mov $1,%%edi\n");
     printf("    mov $banner,%%esi\n");
