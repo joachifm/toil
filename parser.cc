@@ -91,9 +91,17 @@ auto Program() {
     char prognam[scan::token_buf_siz];
     scan::get_name(prognam);
 
+    printf("    .data\n");
+    printf("banner: .ascii \"Hello\\n\"\n");
+    printf("\n");
     printf("    .text\n");
     printf("    .globl main\n");
     printf("main:\n");
+    printf("    mov $%d,%%eax\n", SYS_write);
+    printf("    mov $1,%%edi\n");
+    printf("    mov $banner,%%esi\n");
+    printf("    mov $7,%%edx\n");
+    printf("    syscall\n");
 
     Block();
 
