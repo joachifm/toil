@@ -25,11 +25,19 @@ auto Factor() {
 
 void Expression() {
     Factor();                                 // lhs now in %eax
-    while (scan::sym == '+') {
+    while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
             printf("    movl %%eax,%%edx\n"); // lhs now in %edx
             Factor();                         // rhs now in %eax
             printf("    addl %%edx,%%eax\n"); // result in %eax
+        } else if (scan::accept('-')) {
+            // TODO needing to shuffle is annoying (eax -> ebx -> ebx -> eax)
+            // Destination = Destination - Source;
+            printf("    movl %%eax,%%ebx\n"); // lhs now in %ebx
+            Factor();                         // rhs now in %eax
+            printf("    movl %%eax,%%edx\n"); // rhs now in %edx
+            printf("    movl %%ebx,%%eax\n"); // lhs now in %eax
+            printf("    subl %%edx,%%eax\n"); // result in %eax
         }
     }
 }
