@@ -57,6 +57,7 @@ _end_of_program:
     xorl %edi,%edi
     syscall
 #+end_example
+
 ** Run test harness
 
 The compiler is currently tested by compiling a code fragment, running it
