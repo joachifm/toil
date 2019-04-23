@@ -45,7 +45,7 @@ auto get_sym() {
     // e.g., "(1" would be parsed as a single token.
     len = 0;
     do { val[len++] = static_cast<char>(look); look = getchar(); }
-    while (len < token_len_max && isalnum(look));
+    while (len < token_len_max && (isalnum(look) || look == '_'));
     val[len] = '\0';
 }
 
