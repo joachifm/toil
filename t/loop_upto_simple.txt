@@ -1,0 +1,9 @@
+PROGRAM loopupto
+
+VAR x INT
+
+LOOP i FROM 0 TO 1
+    x := i + 2
+ENDLOOP
+
+END
