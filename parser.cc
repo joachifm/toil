@@ -100,19 +100,12 @@ auto Program() {
     scan::get_name(prognam);
 
     printf("    .data\n");
-    printf("banner: .ascii \"Hello\\n\"\n");
     VarDecl();
     printf("\n");
 
     printf("    .global _start\n");
     printf("    .text\n");
     printf("_start:\n");
-
-    printf("    mov $%d,%%eax\n", SYS_write);
-    printf("    mov $1,%%edi\n");
-    printf("    mov $banner,%%esi\n");
-    printf("    mov $7,%%edx\n");
-    printf("    syscall\n");
 
     Block();
 
