@@ -81,6 +81,11 @@ auto Loop() {
     if (from > upto) error("LOOP expects UPTO >= FROM");
     auto n_iter = upto - from;
     // TODO emit nothing if upto - from = 0 ?
+    //      need to be able to still parse the remainder, just
+    //      not emit anything
+    if (n_iter < 1) {
+        fprintf(stderr, "warning: 0 iteration loop; emitting dead code\n");
+    }
 
     // TODO scoped loop var?
     printf("    .data\n");
