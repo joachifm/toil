@@ -1,0 +1,8 @@
+PROGRAM arith
+
+VAR x INT
+
+x := 2
+x := x + 1
+
+END
