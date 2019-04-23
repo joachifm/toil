@@ -90,7 +90,7 @@ auto Loop() {
     auto l1 = codegen::next_label();
     printf("%s:\n", l1);
     Block();
-    printf("loop %s\n", l1);
+    printf("    loop %s\n", l1);
 
     scan::match_string("ENDLOOP");
 }
