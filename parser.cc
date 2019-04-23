@@ -79,18 +79,21 @@ auto Loop() {
     auto upto = scan::get_number();
 
     if (from > upto) error("LOOP expects UPTO >= FROM");
-    auto bound = upto - from;
-
-    // Initialize loop counter
-    //
+    auto n_iter = upto - from;
     // TODO emit nothing if upto - from = 0 ?
-    // TODO somehow make loop var alias ecx without movl every go around?
-    printf("    movl $%d,%%ecx\n", bound);
+
+    // TODO scoped loop var?
+    printf("    .data\n");
+    printf("%s: .int %d\n", varnam, n_iter);
+    printf("    .text\n");
 
     auto l1 = codegen::next_label();
-    printf("%s:\n", l1);
+    printf("    movl $%d,%%ecx\n", n_iter); // init loop counter
+    printf("%s:\n", l1); // loop start
+    // TODO somehow make loop var alias ecx without movl every go around?
+    printf("    movl %%ecx,%s(%%eip)\n", varnam);
     Block();
-    printf("    loop %s\n", l1);
+    printf("    loop %s\n", l1); // recur when counter = 0
 
     scan::match_string("ENDLOOP");
 }
