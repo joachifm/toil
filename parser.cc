@@ -1,11 +1,7 @@
+#pragma once
+
 #include <stdlib.h>
 #include <sys/syscall.h>
-#include "aux.hh"
-
-#ifdef PARSER_TEST_MAIN
-#include "codegen.cc"
-#include "scanner.cc"
-#endif
 
 namespace parser {
 
@@ -126,12 +122,9 @@ auto Program() {
     printf("    syscall\n");
 }
 
-} // namespace parser
-
-#ifdef PARSER_TEST_MAIN
-int main() {
-    using namespace parser;
+auto Compile() {
     scan::init();
     Program();
 }
-#endif
+
+} // namespace parser
