@@ -66,6 +66,44 @@ auto While() {
     printf("%s:\n", l2);
 }
 
+auto Loop() {
+    scan::match('L');
+
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+
+    scan::match_string("FROM");
+    auto from = scan::get_number();
+
+    scan::match_string("TO");
+    auto upto = scan::get_number();
+
+    if (from > upto) error("LOOP expects UPTO >= FROM");
+    auto n_iter = upto - from;
+    // TODO emit nothing if upto - from = 0 ?
+    //      need to be able to still parse the remainder, just
+    //      not emit anything
+    // TODO if n_iter=0, the generated code is an endless loop
+    if (n_iter < 1) {
+        fprintf(stderr, "warning: 0 iteration loop; emitting dead code\n");
+    }
+
+    // TODO scoped loop var?
+    printf("    .data\n");
+    printf("%s: .int %d\n", varnam, n_iter);
+    printf("    .text\n");
+
+    auto l1 = codegen::next_label();
+    printf("    movl $%d,%%ecx\n", n_iter); // init loop counter
+    printf("%s:\n", l1); // loop start
+    // TODO somehow make loop var alias ecx without movl every go around?
+    printf("    movl %%ecx,%s(%%eip)\n", varnam);
+    Block();
+    printf("    loop %s\n", l1); // recur when counter = 0
+
+    scan::match_string("ENDLOOP");
+}
+
 auto Assignment() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
@@ -79,6 +117,7 @@ void Block() {
         if      (scan::sym == 'I') IfElse();
         else if (scan::sym == 'W') While();
         else if (scan::sym == 'x') Assignment();
+        else if (scan::sym == 'L') Loop();
         else error("expected statement");
     }
 }
