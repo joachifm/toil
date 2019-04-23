@@ -78,12 +78,14 @@ auto Loop() {
     scan::match_string("TO");
     auto upto = scan::get_number();
 
+    if (from > upto) error("LOOP expects UPTO >= FROM");
+    auto bound = upto - from;
+
     // Initialize loop counter
     //
-    // TODO check that upto > from
-    // TODO emit nothing if upto - from = 0
-    // TODO somehow make loop var alias ecx
-    printf("movl $%d,%%ecx\n", upto - from);
+    // TODO emit nothing if upto - from = 0 ?
+    // TODO somehow make loop var alias ecx without movl every go around?
+    printf("movl $%d,%%ecx\n", bound);
 
     auto l1 = codegen::next_label();
     printf("%s:\n", l1);
