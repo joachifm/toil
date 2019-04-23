@@ -10,12 +10,13 @@ void Expression();
 auto Factor() {
     if (scan::sym == '#') {
         auto num = scan::get_number();
-        printf("    movl $%d,%%eax\n", num);
+        printf("    movl $%d,%%edx\n", num);
     } else if (scan::sym == 'x') {
         char varnam[scan::token_buf_siz];
         scan::get_name(varnam);
-        printf("    movl %s(%%eip),%%eax\n", varnam);
+        printf("    movl %s(%%eip),%%edx\n", varnam);
     } else if (scan::accept('(')) {
+        // TODO will inner Expression clobber registers in outer Expression?
         while (!scan::accept(')'))
             Expression();
     } else {
@@ -24,20 +25,15 @@ auto Factor() {
 }
 
 void Expression() {
-    Factor();                                 // lhs now in %eax
+    Factor();
+    printf("   movl %%edx,%%eax\n");
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
-            printf("    movl %%eax,%%edx\n"); // lhs now in %edx
-            Factor();                         // rhs now in %eax
-            printf("    addl %%edx,%%eax\n"); // result in %eax
+            Factor();
+            printf("    addl %%edx,%%eax\n");
         } else if (scan::accept('-')) {
-            // TODO needing to shuffle is annoying (eax -> ebx -> ebx -> eax)
-            // Destination = Destination - Source;
-            printf("    movl %%eax,%%ebx\n"); // lhs now in %ebx
-            Factor();                         // rhs now in %eax
-            printf("    movl %%eax,%%edx\n"); // rhs now in %edx
-            printf("    movl %%ebx,%%eax\n"); // lhs now in %eax
-            printf("    subl %%edx,%%eax\n"); // result in %eax
+            Factor();
+            printf("    subl %%edx,%%eax\n");
         }
     }
 }
