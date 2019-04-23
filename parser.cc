@@ -148,6 +148,8 @@ auto Program() {
 
     Block();
 
+    printf("_end_of_program:\n"); // marker to identify end of emitted code
+
     printf("\n");
     printf("    movl $%d,%%eax\n", SYS_exit);
     printf("    xorl %%edi,%%edi\n");
