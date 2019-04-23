@@ -122,7 +122,7 @@ auto Program() {
     printf("    syscall\n");
 }
 
-auto Compile() {
+auto compile() {
     scan::init();
     Program();
 }

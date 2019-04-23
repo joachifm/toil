@@ -3,5 +3,5 @@
 #include "parser.cc"
 
 int main() {
-    parser::Compile();
+    parser::compile();
 }
