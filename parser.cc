@@ -14,7 +14,7 @@ auto Factor() {
     } else if (scan::sym == 'x') {
         char varnam[scan::token_buf_siz];
         scan::get_name(varnam);
-        printf("    movl $42,%%eax\n");
+        printf("    movl %s(%%eip),%%eax\n", varnam);
     } else if (scan::accept('(')) {
         while (!scan::accept(')'))
             Expression();
