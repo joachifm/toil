@@ -85,7 +85,7 @@ auto Loop() {
     //
     // TODO emit nothing if upto - from = 0 ?
     // TODO somehow make loop var alias ecx without movl every go around?
-    printf("movl $%d,%%ecx\n", bound);
+    printf("    movl $%d,%%ecx\n", bound);
 
     auto l1 = codegen::next_label();
     printf("%s:\n", l1);
