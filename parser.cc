@@ -78,9 +78,17 @@ auto Loop() {
     scan::match_string("TO");
     auto upto = scan::get_number();
 
-    fprintf(stderr, "LOOP %s FROM %d TO %d\n", varnam, from, upto);
+    // Initialize loop counter
+    //
+    // TODO check that upto > from
+    // TODO emit nothing if upto - from = 0
+    // TODO somehow make loop var alias ecx
+    printf("movl $%d,%%ecx\n", upto - from);
 
+    auto l1 = codegen::next_label();
+    printf("%s:\n", l1);
     Block();
+    printf("loop %s\n", l1);
 
     scan::match_string("ENDLOOP");
 }
