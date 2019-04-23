@@ -83,6 +83,7 @@ auto Loop() {
     // TODO emit nothing if upto - from = 0 ?
     //      need to be able to still parse the remainder, just
     //      not emit anything
+    // TODO if n_iter=0, the generated code is an endless loop
     if (n_iter < 1) {
         fprintf(stderr, "warning: 0 iteration loop; emitting dead code\n");
     }
