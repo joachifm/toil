@@ -4,29 +4,71 @@ A toy compiler for a toy language.
 
 * Usage
 
+** Compile a pointless program
+
 #+begin_src sh :exports code :results none
-  ./tfront < t/simple_if.txt
+  ./tfront <<EOF
+  PROGRAM testing
+
+  VAR x INT
+
+  x := 2 + 2
+
+  IF x
+    x := 0
+  ELSE
+    x := 1
+  ENDIF
+
+  END
+  EOF
 #+end_src
 
-#+begin_src sh :results verbatim :exports results
+#+begin_src sh :exports resuts :results verbatim
   cat out.s
 #+end_src
 
 #+RESULTS:
 #+begin_example
+    .data
+x: .int 0
+
+    .global _start
     .text
-    .globl main
-main:
-    movl $0,%eax
+_start:
+    movl $2,%eax
+    movl %eax,%edx
+    movl $2,%eax
+    addl %edx,%eax
+    movl %eax,x(%eip)
+    movl x(%eip),%eax
     test %eax,%eax
     jz L0
-    movl $2,%eax
+    movl $0,%eax
+    movl %eax,x(%eip)
     jmp L1
 L0:
     movl $1,%eax
+    movl %eax,x(%eip)
 L1:
+_end_of_program:
 
     movl $60,%eax
     xorl %edi,%edi
     syscall
 #+end_example
+** Run test harness
+
+The compiler is currently tested by compiling a code fragment, running it
+under gdb, and checking whether various registers/variables have the expected
+values.
+
+#+begin_src sh :exports both :results verbatim
+  exec 2>&1
+  bash ./t/compiler/run_all.sh
+#+end_src
+
+#+RESULTS:
+: t/compiler/test_basic_arith.sh: ok
+: t/compiler/test_basic_assignment.sh: ok
+: t/compiler/test_basic_if_else.sh: ok
