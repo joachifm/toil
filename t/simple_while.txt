@@ -1,5 +1,7 @@
 PROGRAM while
 
+VAR x INT
+
 WHILE 0
     x := 0
 ENDWHILE

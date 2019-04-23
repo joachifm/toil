@@ -1,1 +1,5 @@
-VAR foo INT
+PROGRAM vardecl
+
+VAR x INT
+
+END
