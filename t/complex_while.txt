@@ -1,0 +1,11 @@
+PROGRAM complexWhile
+
+VAR x INT
+
+x := 1
+
+WHILE x
+    x := 0
+ENDWHILE
+
+END
