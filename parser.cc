@@ -66,6 +66,25 @@ auto While() {
     printf("%s:\n", l2);
 }
 
+auto Loop() {
+    scan::match('L');
+
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+
+    scan::match_string("FROM");
+    auto from = scan::get_number();
+
+    scan::match_string("TO");
+    auto upto = scan::get_number();
+
+    fprintf(stderr, "LOOP %s FROM %d TO %d\n", varnam, from, upto);
+
+    Block();
+
+    scan::match_string("ENDLOOP");
+}
+
 auto Assignment() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
@@ -79,6 +98,7 @@ void Block() {
         if      (scan::sym == 'I') IfElse();
         else if (scan::sym == 'W') While();
         else if (scan::sym == 'x') Assignment();
+        else if (scan::sym == 'L') Loop();
         else error("expected statement");
     }
 }
