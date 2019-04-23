@@ -1,0 +1,26 @@
+#! /bin/sh
+set -eu
+
+if ! [ -r gtags.files ] ; then
+    find . .-type f \( -name '*.cc' -o -name '*.hh' \) > gtags.files.tmp
+    mv gtags.files.tmp gtags.files
+fi
+
+# GNU global
+if type -p gtags &>/dev/null ; then
+    if ! [ -r GTAGS ] ; then
+        gtags --sqlite3 -c -f gtags.files
+    else
+        global -u
+    fi
+fi
+
+# tags
+if type -p ctags &>/dev/null ; then
+    ctags -L gtags.files -f tags
+fi
+
+# cscope
+if type -p cscope &>/dev/null ; then
+    cscope -igtags.files -b -q
+fi
