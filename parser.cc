@@ -87,6 +87,17 @@ void Block() {
     }
 }
 
+auto VarDecl() {
+    scan::match_string("VAR");
+
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+
+    scan::match_string("INT");
+
+    printf("%s: .int 0\n", varnam);
+}
+
 auto Program() {
     scan::match_string("PROGRAM");
     char prognam[scan::token_buf_siz];
@@ -94,7 +105,7 @@ auto Program() {
 
     printf("    .data\n");
     printf("banner: .ascii \"Hello\\n\"\n");
-    printf("x: .int 0\n");
+    VarDecl();
     printf("\n");
 
     printf("    .global _start\n");
