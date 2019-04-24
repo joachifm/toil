@@ -97,6 +97,19 @@ auto ForLoop() {
     scan::match_string("ENDFOR");
 }
 
+auto DoTimes() {
+    scan::match('T');
+    auto n_iter = scan::get_number();
+    if (n_iter < 1) error("TIMES expects n > 0");
+    // TODO unroll if n_iter < threshold
+    auto l1 = codegen::next_label();
+    printf("    mov $%d,%%ecx\n", n_iter);
+    printf("%s:\n", l1);
+    Block();
+    printf("    loop %s\n", l1);
+    scan::match_string("ENDTIMES");
+}
+
 auto Assignment() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
@@ -111,6 +124,7 @@ void Block() {
         else if (scan::sym == 'W') While();
         else if (scan::sym == 'x') Assignment();
         else if (scan::sym == 'F') ForLoop();
+        else if (scan::sym == 'T') DoTimes();
         else error("expected statement");
     }
 }
