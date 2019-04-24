@@ -26,7 +26,7 @@ auto Factor() {
 
 void Expression() {
     Factor();
-    printf("   movl %%edx,%%eax\n");
+    printf("    movl %%edx,%%eax\n");
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
             Factor();
