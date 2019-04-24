@@ -26,6 +26,7 @@ auto Factor() {
 
 void Expression() {
     Factor();
+    // TODO unnecessary shuffle if no arith operation
     printf("    movl %%edx,%%eax\n");
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
