@@ -16,9 +16,12 @@ auto Factor() {
         scan::get_name(varnam);
         printf("    movl %s(%%eip),%%edx\n", varnam);
     } else if (scan::accept('(')) {
-        // TODO will inner Expression clobber registers in outer Expression?
-        while (!scan::accept(')'))
+        while (!scan::accept(')')) {
+            printf("    pushq %%rax\n");      // save accumulator
             Expression();
+            printf("    movl %%eax,%%edx\n"); // move temp accumulator to return
+            printf("    popq %%rax\n");       // restore original accumulator
+        }
     } else {
         error("expected factor, got %c", scan::sym);
     }
@@ -27,6 +30,7 @@ auto Factor() {
 void Expression() {
     Factor();
     // TODO unnecessary shuffle if no arith operation
+    //      could pass dest register to Factor()
     printf("    movl %%edx,%%eax\n");
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
