@@ -69,6 +69,18 @@ data CPU = CPU
   , mm :: Map Adr Cell
   } deriving (Eq, Show, Read)
 
+regMap = Map.fromList (zip [R0 ..] (repeat 0))
+
+memMap len = Map.fromList (zip [0..len] (repeat (Data 0)))
+
+cpu :: CPU
+cpu = CPU
+  { pc = 0
+  , ir = 0
+  , rs = regMap
+  , mm = memMap memLen
+  }
+
 readReg :: Reg -> CPU -> Imm
 readReg r st = case Map.lookup r (rs st) of
   Just v -> v
@@ -77,15 +89,8 @@ readReg r st = case Map.lookup r (rs st) of
 writeReg :: Reg -> Imm -> CPU -> CPU
 writeReg r v st = st { rs = Map.insert r v (rs st) }
 
+memLen :: Int
 memLen = 64
-
-cpu :: CPU
-cpu = CPU
-  { pc = 0
-  , ir = 0
-  , rs = Map.fromList (zip [R0 ..] (repeat 0))
-  , mm = Map.fromList (zip [0..memLen] (repeat (Data 0)))
-  }
 
 step :: CPU -> CPU
 step st =
