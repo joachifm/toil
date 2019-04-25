@@ -1,8 +1,8 @@
-#! /bin/sh
-set -eu
+#! /bin/sh -eu
 
+# file index
 if ! [ -r gtags.files ] ; then
-    find . .-type f \( -name '*.cc' -o -name '*.hh' \) > gtags.files.tmp
+    find . -type f \( -name '*.cc' -o -name '*.hh' \) > gtags.files.tmp
     mv gtags.files.tmp gtags.files
 fi
 
@@ -22,5 +22,5 @@ fi
 
 # cscope
 if type -p cscope &>/dev/null ; then
-    cscope -igtags.files -b -q
+    cscope -i gtags.files -b -q
 fi
