@@ -30,7 +30,8 @@ auto Factor() {
 void Expression() {
     Factor();
     // TODO unnecessary shuffle if no arith operation
-    //      could pass dest register to Factor()
+    //      could pass dest register to Factor(), edx
+    //      if nested, eax otherwise
     printf("    movl %%edx,%%eax\n");
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
@@ -107,6 +108,7 @@ auto DoTimes() {
     if (n_iter < 1) error("TIMES expects n > 0");
     // TODO unroll if n_iter < threshold
     auto l1 = codegen::next_label();
+    // TODO unnecessary push/pop if not nested within another loop
     printf("    pushq %%rcx\n");
     printf("    mov $%d,%%ecx\n", n_iter);
     printf("%s:\n", l1);
