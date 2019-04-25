@@ -107,11 +107,13 @@ auto DoTimes() {
     if (n_iter < 1) error("TIMES expects n > 0");
     // TODO unroll if n_iter < threshold
     auto l1 = codegen::next_label();
+    printf("    pushq %%rcx\n");
     printf("    mov $%d,%%ecx\n", n_iter);
     printf("%s:\n", l1);
     Block();
     printf("    loop %s\n", l1);
     scan::match_string("ENDTIMES");
+    printf("    popq %%rcx\n");
 }
 
 auto Assignment() {
