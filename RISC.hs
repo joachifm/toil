@@ -1,17 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module RISC where
+--
+-- A port of the RISC emulator described in
+-- N. Wirth, Compiler Construction
+--
+
+module RISC (
+  CPU,
+  cpu,
+  step,
+  execute,
+  ) where
 
 import qualified Test.Hspec as Spec
 
-import Data.Bits
 import Data.Int
 import Data.Word
 import Data.Map (Map)
 import qualified Data.Map.Strict as Map
-import qualified Control.Monad.State as State
-import qualified Control.Monad.Reader as Reader
-import qualified Control.Monad.Writer as Writer
 
 type Adr = Word32
 
@@ -69,9 +75,11 @@ data CPU = CPU
   , mm :: Map Adr Cell
   } deriving (Eq, Show, Read)
 
+regMap :: Map Reg Imm
 regMap = Map.fromList (zip [R0 ..] (repeat 0))
 
-memMap len = Map.fromList (zip [0..len] (repeat (Data 0)))
+memMap :: Int -> Map Adr Cell
+memMap len = Map.fromList (zip [0..fromIntegral len] (repeat (Data 0)))
 
 cpu :: CPU
 cpu = CPU
@@ -108,7 +116,11 @@ execute instr st =
     Mov a (R b) ->
       st { rs = Map.insert a (readReg b st) (rs st) }
 
-    Add a b n -> st
+    Add a b (I n) ->
+      st { rs = Map.insert a (readReg b st + n) (rs st) }
+
+    Add a b (R c) ->
+      st { rs = Map.insert a (readReg b st + readReg c st) (rs st) }
 
     And a b n -> st
 
