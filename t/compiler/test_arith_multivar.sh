@@ -11,7 +11,7 @@ VAR z INT
 
 x := 1
 y := 2
-z := 1 + 2
+z := x + y
 
 END
 EOF

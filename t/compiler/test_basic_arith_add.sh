@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ./tfront <<EOF
-PROGRAM basicarith
+PROGRAM basicarith_add
 
 VAR x INT
 

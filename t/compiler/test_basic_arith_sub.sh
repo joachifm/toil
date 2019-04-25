@@ -2,12 +2,11 @@
 set -euo pipefail
 
 ./tfront <<EOF
-PROGRAM basicarithsub
+PROGRAM basicarith_sub
 
 VAR x INT
 
-x := 2
-x := x - 2
+x := 2 - 2
 
 END
 EOF
