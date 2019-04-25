@@ -3,9 +3,10 @@
 declare -i expected_fail_count=0
 declare -i fail_count=0
 
-for x in t/compiler/test_* ; do
-    echo -n "$x: " >&2
-    if ./$x ; then
+for exe in ./t/compiler/test_* ; do
+    [[ -x "$exe" ]] || continue
+    echo -n "$exe: " >&2
+    if ./$exe ; then
         echo "ok" >&2
     else
         echo "fail" >&2
