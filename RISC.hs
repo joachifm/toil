@@ -19,6 +19,7 @@ import Data.Word
 import Data.Map (Map)
 import qualified Data.Map.Strict as Map
 import Data.Bits
+import Data.Serialize
 
 type Adr = Word32
 
