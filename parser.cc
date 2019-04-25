@@ -154,7 +154,8 @@ auto Program() {
     scan::get_name(prognam);
 
     printf("    .data\n");
-    VarDecl();
+    while (scan::sym == 'V')
+        VarDecl();
     printf("\n");
 
     printf("    .global _start\n");
