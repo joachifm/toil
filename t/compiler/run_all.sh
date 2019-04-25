@@ -2,11 +2,12 @@
 
 declare -i expected_fail_count=0
 declare -i fail_count=0
+tmout=5s
 
 for exe in ./t/compiler/test_* ; do
     [[ -x "$exe" ]] || continue
     echo -n "$exe: " >&2
-    if ./$exe ; then
+    if timeout "$tmout" ./$exe ; then
         echo "ok" >&2
     else
         echo "fail" >&2
