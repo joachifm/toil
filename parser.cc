@@ -23,17 +23,30 @@ auto Factor() {
     }
 }
 
-void Expression() {
+auto Term() {
     Factor();
+    while (scan::sym == '*' || scan::sym == '/') {
+        if (scan::accept('*')) {
+            Factor();
+            fprintf(stderr, "MUL\n");
+        } else if (scan::accept('/')) {
+            Factor();
+            fprintf(stderr, "DIV\n");
+        }
+    }
+}
+
+void Expression() {
+    Term();
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
-            Factor();
+            Term();
             printf("    popq %%rdx\n");
             printf("    popq %%rbp\n");
             printf("    addl %%edx,%%ebp\n");
             printf("    pushq %%rbp\n");
         } else if (scan::accept('-')) {
-            Factor();
+            Term();
             printf("    popq %%rdx\n");
             printf("    popq %%rbp\n");
             printf("    subl %%edx,%%ebp\n");
