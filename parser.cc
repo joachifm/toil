@@ -34,7 +34,12 @@ auto Term() {
             printf("    pushq %%rax\n");
         } else if (scan::accept('/')) {
             Factor();
-            fprintf(stderr, "DIV\n");
+            printf("    popq %%rcx\n");
+            printf("    popq %%rax\n");
+            printf("    xorl %%edx,%%edx\n"); // SIGFPE otherwise
+            printf("    div %%ecx\n");
+            printf("    pushq %%rcx\n"); // remainder
+            printf("    pushq %%rax\n"); // quot
         }
     }
 }
