@@ -10,18 +10,14 @@ void Expression();
 auto Factor() {
     if (scan::sym == '#') {
         auto num = scan::get_number();
-        printf("    movl $%d,%%edx\n", num);
+        printf("    pushq $%d\n", num);
     } else if (scan::sym == 'x') {
         char varnam[scan::token_buf_siz];
         scan::get_name(varnam);
-        printf("    movl %s(%%eip),%%edx\n", varnam);
+        printf("    pushq %s(%%eip)\n", varnam);
     } else if (scan::accept('(')) {
-        while (!scan::accept(')')) {
-            printf("    pushq %%rax\n");      // save accumulator
+        while (!scan::accept(')'))
             Expression();
-            printf("    movl %%eax,%%edx\n"); // move temp accumulator to return
-            printf("    popq %%rax\n");       // restore original accumulator
-        }
     } else {
         error("expected factor, got %c", scan::sym);
     }
@@ -29,17 +25,19 @@ auto Factor() {
 
 void Expression() {
     Factor();
-    // TODO unnecessary shuffle if no arith operation
-    //      could pass dest register to Factor(), edx
-    //      if nested, eax otherwise
-    printf("    movl %%edx,%%eax\n");
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
             Factor();
-            printf("    addl %%edx,%%eax\n");
+            printf("    popq %%rdx\n");
+            printf("    popq %%rbp\n");
+            printf("    addl %%edx,%%ebp\n");
+            printf("    pushq %%rbp\n");
         } else if (scan::accept('-')) {
             Factor();
-            printf("    subl %%edx,%%eax\n");
+            printf("    popq %%rdx\n");
+            printf("    popq %%rbp\n");
+            printf("    subl %%edx,%%ebp\n");
+            printf("    pushq %%rbp\n");
         }
     }
 }
@@ -50,7 +48,8 @@ auto IfElse() {
     auto l1 = codegen::next_label();
     auto l2 = codegen::next_label();
     scan::match('I');
-    Expression();                     // condition result in %%eax
+    Expression();                     // condition result top of stack
+    printf("    popq %%rax\n");
     printf("    test %%eax,%%eax\n"); // aka cmp $0,%eax
     printf("    jz %s\n", l1);        // condition evals to 0, jump to else
     Block();                          // then-branch code
@@ -67,7 +66,8 @@ auto While() {
     auto l2 = codegen::next_label();
     scan::match('W');
     printf("%s:\n", l1);
-    Expression(); // condition in %eax
+    Expression(); // condition top of stack
+    printf("    popq %%rax\n");
     printf("    test %%eax,%%eax\n");
     printf("    jz %s\n", l2); // condition evals to 0, end
     Block();
@@ -123,7 +123,7 @@ auto Assignment() {
     scan::get_name(varnam);
     scan::match(':'); scan::match('=');
     Expression();
-    printf("    movl %%eax,%s(%%eip)\n", varnam);
+    printf("    popq %s(%%eip)\n", varnam);
 }
 
 void Block() {
