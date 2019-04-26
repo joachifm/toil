@@ -29,9 +29,9 @@ auto Term() {
         if (scan::accept('*')) {
             Factor();
             printf("    popq %%rdx\n");
-            printf("    popq %%rbp\n");
-            printf("    imul %%edx,%%ebp\n");
-            printf("    pushq %%rbp\n");
+            printf("    popq %%rax\n");
+            printf("    imul %%edx,%%eax\n");
+            printf("    pushq %%rax\n");
         } else if (scan::accept('/')) {
             Factor();
             fprintf(stderr, "DIV\n");
@@ -45,15 +45,15 @@ void Expression() {
         if (scan::accept('+')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rbp\n");
-            printf("    addl %%edx,%%ebp\n");
-            printf("    pushq %%rbp\n");
+            printf("    popq %%rax\n");
+            printf("    addl %%edx,%%eax\n");
+            printf("    pushq %%rax\n");
         } else if (scan::accept('-')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rbp\n");
-            printf("    subl %%edx,%%ebp\n");
-            printf("    pushq %%rbp\n");
+            printf("    popq %%rax\n");
+            printf("    subl %%edx,%%eax\n");
+            printf("    pushq %%rax\n");
         }
     }
 }
