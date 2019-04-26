@@ -24,29 +24,33 @@ size_t len; // Token value length
 auto get_sym() {
     assert(look != EOF);
 
-    // Skip leading whitespace
     while (isspace(look)) look = getchar();
 
-    // Classify token
     if (isdigit(look)) { // Numeric constant
         sym = '#';
+        len = 0;
+        do { val[len++] = static_cast<char>(look); look = getchar(); }
+        while (len < token_len_max && isdigit(look));
+        val[len] = '\0';
     } else if (islower(look)) { // Identifier
         sym = 'x';
-    } else {
+        len = 0;
+        do { val[len++] = static_cast<char>(look); look = getchar(); }
+        while (len < token_len_max && (isalnum(look) || look == '_'));
+        val[len] = '\0';
+    } else if (isupper(look)) { // Keyword
         sym = look;
+        len = 0;
+        do { val[len++] = static_cast<char>(look); look = getchar(); }
+        while (len < token_len_max && isupper(look));
+        val[len] = '\0';
+    } else { // Special
+        sym = look;
+        len = 1;
+        val[0] = static_cast<char>(look);
+        val[1] = '\0';
+        look = getchar();
     }
-
-    // Read token value
-    //
-    // Note: only numbers and identifiers/keywords
-    // get multichar tokens ...
-    //
-    // An alternative is to consume upto next space but then
-    // e.g., "(1" would be parsed as a single token.
-    len = 0;
-    do { val[len++] = static_cast<char>(look); look = getchar(); }
-    while (len < token_len_max && (isalnum(look) || look == '_'));
-    val[len] = '\0';
 }
 
 // Advance token if current sym matches or abort.
