@@ -47,8 +47,8 @@ struct item {
 
     union {
         struct { int val; } con;
-        struct { int adr; } var;
         struct { int idx; } reg;
+        struct { int adr; } var;
     };
 };
 
@@ -153,7 +153,8 @@ static Item* factor(Item* r) {
 
 static Item* term(Item* r) {
     factor(r);
-    while (sym == '*') {
+    while (sym == '*' || sym == '/') {
+        // XXX copy-paste galore
         if (accept('*')) {
             Item* h = factor(&(Item){});
             if (r->t == CON && h->t == CON) {
@@ -163,6 +164,15 @@ static Item* term(Item* r) {
                 emit_arith_oper("mul", h);
                 *r = (Item){ .t = REG, .reg.idx = REG_EAX };
             }
+        } else if (accept('/')) {
+            Item* h = factor(&(Item){});
+            if (r->t == CON && h->t == CON) {
+                r->con.val /= h->con.val;
+            } else {
+                emit_arith_oper("div", r);
+                emit_arith_oper("div", h);
+                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+            }
         }
     }
     return r;
@@ -170,7 +180,8 @@ static Item* term(Item* r) {
 
 Item* arith_expression(Item * r) {
     term(r);
-    while (sym == '+') {
+    while (sym == '+' || sym == '-') {
+        // XXX copy-paste galore
         if (accept('+')) {
             Item* h = term(&(Item){});
             if (r->t == CON && h->t == CON) {
@@ -178,6 +189,15 @@ Item* arith_expression(Item * r) {
             } else {
                 emit_arith_oper("add", r);
                 emit_arith_oper("add", h);
+                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+            }
+        } else if (accept('-')) {
+            Item* h = term(&(Item){});
+            if (r->t == CON && h->t == CON) {
+                r->con.val -= h->con.val;
+            } else {
+                emit_arith_oper("sub", r);
+                emit_arith_oper("sub", h);
                 *r = (Item){ .t = REG, .reg.idx = REG_EAX };
             }
         }
@@ -188,6 +208,7 @@ Item* arith_expression(Item * r) {
 Item* expression(Item * r) {
     arith_expression(r);
     while (sym == '>' || sym == '<' || sym == '=') {
+        // XXX copy-paste galore
         if (accept('>')) {
             Item* h = arith_expression(&(Item){});
             if (r->t == CON && h->t == CON) {
