@@ -28,7 +28,10 @@ auto Term() {
     while (scan::sym == '*' || scan::sym == '/') {
         if (scan::accept('*')) {
             Factor();
-            fprintf(stderr, "MUL\n");
+            printf("    popq %%rdx\n");
+            printf("    popq %%rbp\n");
+            printf("    imul %%edx,%%ebp\n");
+            printf("    pushq %%rbp\n");
         } else if (scan::accept('/')) {
             Factor();
             fprintf(stderr, "DIV\n");
