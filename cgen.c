@@ -168,7 +168,7 @@ static Item* term(Item* r) {
     return r;
 }
 
-Item* expression(Item * r) {
+Item* arith_expression(Item * r) {
     term(r);
     while (sym == '+') {
         if (accept('+')) {
@@ -178,6 +178,44 @@ Item* expression(Item * r) {
             } else {
                 emit_arith_oper("add", r);
                 emit_arith_oper("add", h);
+                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+            }
+        }
+    }
+    return r;
+}
+
+Item* expression(Item * r) {
+    arith_expression(r);
+    while (sym == '>' || sym == '<' || sym == '=') {
+        if (accept('>')) {
+            Item* h = arith_expression(&(Item){});
+            if (r->t == CON && h->t == CON) {
+                int t1 = r->con.val > h->con.val;
+                r->con.val = t1;
+            } else {
+                emit_arith_oper("cmp", r);
+                emit_arith_oper("cmp", h);
+                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+            }
+        } else if (accept('=')) {
+            Item* h = arith_expression(&(Item){});
+            if (r->t == CON && h->t == CON) {
+                int t1 = r->con.val == h->con.val;
+                r->con.val = t1;
+            } else {
+                emit_arith_oper("cmp", r);
+                emit_arith_oper("cmp", h);
+                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+            }
+        } else if (accept('<')) {
+            Item* h = arith_expression(&(Item){});
+            if (r->t == CON && h->t == CON) {
+                int t1 = r->con.val < h->con.val;
+                r->con.val = t1;
+            } else {
+                emit_arith_oper("cmp", r);
+                emit_arith_oper("cmp", h);
                 *r = (Item){ .t = REG, .reg.idx = REG_EAX };
             }
         }
