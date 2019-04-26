@@ -117,7 +117,7 @@ static Item* emit_arith_oper(char const* op, Item* r) {
         printf("%d(%%rip)", r->var.adr);
         break;
     case REG:
-        printf("%%%s\n", REGNAM(r->reg.idx));
+        printf("%%%s", REGNAM(r->reg.idx));
         break;
     }
     printf(",%%eax\n");
