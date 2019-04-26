@@ -51,13 +51,13 @@ auto get_sym() {
 
 // Advance token if current sym matches or abort.
 auto match(int c) {
-    if (sym != c) error("expected sym='%c'", c);
+    if (sym != c) error("expected sym '%c'; got '%c' (val='%s')", c, sym, val);
     get_sym();
 }
 
 // Advance token if current lexeme matches or abort.
 auto match_string(char const* s) {
-    if (strcmp(val, s) != 0) error("expected '%s'", s);
+    if (strcmp(val, s) != 0) error("expected '%s'; got '%s'", s, val);
     get_sym();
 }
 
