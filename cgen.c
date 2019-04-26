@@ -3,16 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// A parsing procedure processes a language construct and returns an item
-// describing the value of the construct.
-//
-// Parsing proceeds top-down, items are propagated bottom-up
-//
-// Code is generated only if the transformation cannot be completed at compile
-// time, at the last possible moment.
-
-// To avoid allocation, parsing routines receive pointers to Item storage from
-// their caller.
+// To avoid dynamic memory allocation, parsing routines receive pointers to Item
+// storage from their caller (allocated on caller's stack).
 //
 // The pattern
 //
@@ -40,9 +32,9 @@ enum {
 
 struct item {
     enum {
-        CON = 1,
-        REG,
-        VAR,
+        CON = 2,
+        REG = 4,
+        VAR = 8,
     } t;
 
     union {
@@ -53,6 +45,13 @@ struct item {
 };
 
 typedef struct item Item;
+
+#define GET_CON(X) \
+    ({ assert((X)->t == CON); (X)->con.val; })
+#define GET_VAR(X) \
+    ({ assert((X)->t == VAR); (X)->var.adr; })
+#define GET_REG(X) \
+    ({ assert((X)->t == REG); (X)->reg.val; })
 
 static int sym = 0;
 
@@ -79,12 +78,16 @@ static int number(void) {
 
 static char regnam[NUM_REG][4] = {
     [REG_EAX] = "eax",
+    [REG_EDX] = "edx",
+    [REG_EBX] = "ebx",
+    [REG_EDI] = "edi",
+    [REG_ESI] = "esi",
 };
 
 #define REGNAM(I) \
     ({ assert((I) >= 1 && (I) < NUM_REG); regnam[I]; })
 
-static void pr_item(Item const* it) {
+static void print_item(Item const* it) {
     printf("Item {");
     switch (it->t) {
     case CON:
@@ -98,30 +101,6 @@ static void pr_item(Item const* it) {
         break;
     }
     printf("}\n");
-}
-
-// An expression
-//
-//   a + b + ... n
-//
-// is eval'd left to right, with the result accumulated in
-// eax.
-
-static Item* emit_arith_oper(char const* op, Item* r) {
-    printf("    %s ", op);
-    switch (r->t) {
-    case CON:
-        printf("$%d", r->con.val);
-        break;
-    case VAR:
-        printf("%d(%%rip)", r->var.adr);
-        break;
-    case REG:
-        printf("%%%s", REGNAM(r->reg.idx));
-        break;
-    }
-    printf(",%%eax\n");
-    return r;
 }
 
 static Item* expression(Item* r);
@@ -159,19 +138,11 @@ static Item* term(Item* r) {
             Item* h = factor(&(Item){});
             if (r->t == CON && h->t == CON) {
                 r->con.val *= h->con.val;
-            } else {
-                emit_arith_oper("mul", r);
-                emit_arith_oper("mul", h);
-                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
             }
         } else if (accept('/')) {
             Item* h = factor(&(Item){});
             if (r->t == CON && h->t == CON) {
                 r->con.val /= h->con.val;
-            } else {
-                emit_arith_oper("div", r);
-                emit_arith_oper("div", h);
-                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
             }
         }
     }
@@ -186,19 +157,11 @@ Item* arith_expression(Item * r) {
             Item* h = term(&(Item){});
             if (r->t == CON && h->t == CON) {
                 r->con.val += h->con.val;
-            } else {
-                emit_arith_oper("add", r);
-                emit_arith_oper("add", h);
-                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
             }
         } else if (accept('-')) {
             Item* h = term(&(Item){});
             if (r->t == CON && h->t == CON) {
                 r->con.val -= h->con.val;
-            } else {
-                emit_arith_oper("sub", r);
-                emit_arith_oper("sub", h);
-                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
             }
         }
     }
@@ -212,32 +175,17 @@ Item* expression(Item * r) {
         if (accept('>')) {
             Item* h = arith_expression(&(Item){});
             if (r->t == CON && h->t == CON) {
-                int t1 = r->con.val > h->con.val;
-                r->con.val = t1;
-            } else {
-                emit_arith_oper("cmp", r);
-                emit_arith_oper("cmp", h);
-                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+                r->con.val = r->con.val > h->con.val;
             }
         } else if (accept('=')) {
             Item* h = arith_expression(&(Item){});
             if (r->t == CON && h->t == CON) {
-                int t1 = r->con.val == h->con.val;
-                r->con.val = t1;
-            } else {
-                emit_arith_oper("cmp", r);
-                emit_arith_oper("cmp", h);
-                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+                r->con.val = r->con.val == h->con.val;
             }
         } else if (accept('<')) {
             Item* h = arith_expression(&(Item){});
             if (r->t == CON && h->t == CON) {
-                int t1 = r->con.val < h->con.val;
-                r->con.val = t1;
-            } else {
-                emit_arith_oper("cmp", r);
-                emit_arith_oper("cmp", h);
-                *r = (Item){ .t = REG, .reg.idx = REG_EAX };
+                r->con.val = r->con.val < h->con.val;
             }
         }
     }
@@ -247,5 +195,5 @@ Item* expression(Item * r) {
 int main(void) {
     sym = getchar();
     Item* r = expression(&(Item){});
-    pr_item(r);
+    print_item(r);
 }
