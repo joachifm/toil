@@ -128,6 +128,18 @@ auto IfElse() {
     printf("%s:\n", l2);
 }
 
+auto RepeatUntil() {
+    scan::match('R');
+    auto l1 = codegen::next_label();
+    printf("%s:\n", l1);
+    Block();
+    scan::match_string("UNTIL");
+    Expression();
+    printf("    popq %%rax\n");
+    printf("    test %%eax,%%eax\n");
+    printf("    jz %s\n", l1); // recur until condition evals to 1
+}
+
 auto While() {
     auto l1 = codegen::next_label();
     auto l2 = codegen::next_label();
@@ -194,12 +206,13 @@ auto Assignment() {
 }
 
 void Block() {
-    while (scan::sym != 'E') {
+    while (scan::sym != 'E' && scan::sym != 'U') {
         if      (scan::sym == 'I') IfElse();
         else if (scan::sym == 'W') While();
         else if (scan::sym == 'x') Assignment();
         else if (scan::sym == 'F') ForLoop();
         else if (scan::sym == 'T') DoTimes();
+        else if (scan::sym == 'R') RepeatUntil();
         else error("expected statement");
     }
 }
