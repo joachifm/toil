@@ -64,20 +64,42 @@ auto ArithExpression() {
 }
 
 void Expression() {
+    // Generally,
+    //
+    //    cmp src,dst  ZF CF
+    //    dst = src    1  0
+    //    dst < src    0  1
+    //    dst > src    0  0
+    //
+    // Use SETcc to set byte depending on condition flag
+    //
+    // a op b gives b at tos, a at tos-1
     ArithExpression();
     while (scan::sym == '>' || scan::sym == '<' || scan::sym == '=') {
         if (scan::accept('>')) {
             ArithExpression();
-            printf("    subq $8,%%rsp\n");
-            printf("    subq $8,%%rsp\n");
+            printf("    popq %%rdx\n"); // b
+            printf("    popq %%rax\n"); // a
+            printf("    cmp %%edx,%%eax\n");
+            printf("    setg %%al\n");
+            printf("    movzx %%al,%%eax\n");
+            printf("    pushq %%rax\n");
         } else if (scan::accept('<')) {
             ArithExpression();
-            printf("    subq $8,%%rsp\n");
-            printf("    subq $8,%%rsp\n");
+            printf("    popq %%rdx\n"); // b
+            printf("    popq %%rax\n"); // a
+            printf("    cmp %%edx,%%eax\n");
+            printf("    setl %%al\n");
+            printf("    movzx %%al,%%eax\n");
+            printf("    pushq %%rax\n");
         } else if (scan::accept('=')) {
             ArithExpression();
-            printf("    subq $8,%%rsp\n");
-            printf("    subq $8,%%rsp\n");
+            printf("    popq %%rdx\n"); // b
+            printf("    popq %%rax\n"); // a
+            printf("    cmp %%edx,%%eax\n");
+            printf("    sete %%al\n");
+            printf("    movzx %%al,%%eax\n");
+            printf("    pushq %%rax\n");
         }
     }
 }
