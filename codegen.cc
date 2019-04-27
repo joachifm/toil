@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdio>
-
 #include "aux.hh"
 #include "labels_gen.h"
 
