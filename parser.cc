@@ -44,7 +44,7 @@ auto Term() {
     }
 }
 
-void Expression() {
+auto ArithExpression() {
     Term();
     while (scan::sym == '+' || scan::sym == '-') {
         if (scan::accept('+')) {
@@ -59,6 +59,25 @@ void Expression() {
             printf("    popq %%rax\n");
             printf("    subl %%edx,%%eax\n");
             printf("    pushq %%rax\n");
+        }
+    }
+}
+
+void Expression() {
+    ArithExpression();
+    while (scan::sym == '>' || scan::sym == '<' || scan::sym == '=') {
+        if (scan::accept('>')) {
+            ArithExpression();
+            printf("    subq $8,%%rsp\n");
+            printf("    subq $8,%%rsp\n");
+        } else if (scan::accept('<')) {
+            ArithExpression();
+            printf("    subq $8,%%rsp\n");
+            printf("    subq $8,%%rsp\n");
+        } else if (scan::accept('=')) {
+            ArithExpression();
+            printf("    subq $8,%%rsp\n");
+            printf("    subq $8,%%rsp\n");
         }
     }
 }
