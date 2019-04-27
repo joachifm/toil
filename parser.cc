@@ -1,7 +1,12 @@
 #pragma once
 
+#include <cstdio>
 #include <cstdlib>
 #include <sys/syscall.h>
+
+#include "aux.hh"
+#include "codegen.cc"
+#include "scanner.cc"
 
 namespace parser {
 
@@ -199,3 +204,10 @@ auto compile() {
 }
 
 } // namespace parser
+
+#ifdef PARSER_TEST_MAIN
+int main() {
+    using namespace parser;
+    compile();
+}
+#endif
