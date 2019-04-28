@@ -58,6 +58,14 @@ auto resolve(char const* name, Symtab::Klass kind) {
     return p;
 }
 
+auto print_symtab() {
+    fprintf(stderr, "name\tklass\n");
+    fprintf(stderr, "----\t-----\n");
+    for (Symtab* p = symtab; p; p = p->prev) {
+        fprintf(stderr, "%s\t%d\n", p->name, p->t);
+    }
+}
+
 auto next_label() -> char const* {
     static unsigned next;
     if (next > label_count_max - 1) error("exhausted labels");
