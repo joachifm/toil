@@ -247,6 +247,29 @@ auto VarDecl() {
     printf("%s: .int 0\n", varnam);
 }
 
+void TypSpec() {
+    if (scan::sym == 'x') {
+        char typnam[scan::token_buf_siz];
+        scan::get_name(typnam);
+#if 0
+        auto typ = cgen::resolve(typnam, cgen::Symtab::Klass::KLASS_TYP);
+        if (!typ) error("unbound type: %s", typnam);
+#endif
+    } else if (scan::sym == 'R') {
+        scan::match_string("RECORD");
+        if (scan::sym == '(') {
+            TypSpec();
+            scan::match(')');
+        }
+    } else if (scan::sym == 'A') {
+        scan::match_string("ARRAY");
+        auto len = scan::get_number();
+        TypSpec();
+    } else {
+        error("expected type specifier");
+    }
+}
+
 auto TypDecl() {
     scan::match_string("TYPE");
 
