@@ -283,6 +283,9 @@ auto compile() {
 #ifdef PARSER_TEST_MAIN
 int main() {
     using namespace parser;
+    using namespace cgen;
+
     compile();
+    print_symtab();
 }
 #endif
