@@ -113,7 +113,19 @@ void Expression() {
     Relation();
     while (scan::sym == 'A' || scan::sym == 'O') {
         if (scan::accept('A')) {
+            auto l1 = codegen::next_label();
+            auto l2 = codegen::next_label();
+            printf("    popq %%rax\n");
+            printf("    test %%eax,%%eax\n");
+            printf("    jz %s\n", l1); // lhs false, short-circuit
             Relation();
+            printf("    jmp %s\n", l2); // lhs true, step over false case
+            printf("%s:\n", l1); // in the false case, push zero to stack
+            printf("    sete %%al\n");
+            printf("    movzx %%al,%%eax\n");
+            printf("    xorl %%eax,%%eax\n"); // eax 1 from sete, xor to 0
+            printf("    pushq %%rax\n");
+            printf("%s:\n", l2);
         } else if (scan::accept('O')) {
             Relation();
         }
