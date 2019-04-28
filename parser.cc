@@ -247,6 +247,14 @@ auto VarDecl() {
     printf("%s: .int 0\n", varnam);
 }
 
+auto ProcDecl() {
+    scan::match_string("PROC");
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+    printf("%s:\n", cgen::next_label());
+    Block();
+}
+
 auto Program() {
     scan::match_string("PROGRAM");
     char prognam[scan::token_buf_siz];
@@ -257,8 +265,13 @@ auto Program() {
         VarDecl();
     printf("\n");
 
-    printf("    .global _start\n");
     printf("    .text\n");
+
+    while (scan::sym == 'P')
+        ProcDecl();
+    printf("\n");
+
+    printf("    .global _start\n");
     printf("_start:\n");
 
     Block();
