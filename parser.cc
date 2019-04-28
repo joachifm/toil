@@ -247,10 +247,22 @@ auto VarDecl() {
     printf("%s: .int 0\n", varnam);
 }
 
+auto TypDecl() {
+    scan::match_string("TYPE");
+
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+
+    scan::match_string("INT");
+}
+
 auto Program() {
     scan::match_string("PROGRAM");
     char prognam[scan::token_buf_siz];
     scan::get_name(prognam);
+
+    while (scan::sym == 'T')
+        TypDecl();
 
     printf("    .data\n");
     while (scan::sym == 'V')
