@@ -242,6 +242,8 @@ auto VarDecl() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
 
+    cgen::intern(varnam, cgen::Symtab::KLASS_VAR);
+
     scan::match_string("INT");
 
     printf("%s: .int 0\n", varnam);
