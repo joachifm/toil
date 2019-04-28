@@ -219,9 +219,17 @@ auto DoTimes() {
 auto Assignment() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
-    scan::match(':'); scan::match('=');
-    Expression();
-    printf("    popq %s(%%eip)\n", varnam);
+    if (scan::sym == ':') {
+        scan::match(':'); scan::match('=');
+        Expression();
+        printf("    popq %s(%%eip)\n", varnam);
+    } else if (scan::sym == '(') {
+        scan::match('(');
+        scan::match(')');
+        printf("    call %s\n", varnam);
+    } else {
+        error("expected assignment or procedure call");
+    }
 }
 
 void Block() {
@@ -232,7 +240,7 @@ void Block() {
         else if (scan::sym == 'F') ForLoop();
         else if (scan::sym == 'T') DoTimes();
         else if (scan::sym == 'R') RepeatUntil();
-        else error("expected statement");
+        else error("expected statement; got %c (%s)", scan::sym, scan::val);
     }
 }
 
@@ -247,6 +255,16 @@ auto VarDecl() {
     printf("%s: .int 0\n", varnam);
 }
 
+auto ProcDecl() {
+    scan::match_string("PROC");
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+    printf("%s:\n", varnam);
+    Block();
+    printf("    ret\n");
+    scan::match_string("ENDPROC");
+}
+
 auto Program() {
     scan::match_string("PROGRAM");
     char prognam[scan::token_buf_siz];
@@ -257,8 +275,13 @@ auto Program() {
         VarDecl();
     printf("\n");
 
-    printf("    .global _start\n");
     printf("    .text\n");
+
+    while (scan::sym == 'P')
+        ProcDecl();
+    printf("\n");
+
+    printf("    .global _start\n");
     printf("_start:\n");
 
     Block();
