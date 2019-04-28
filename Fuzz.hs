@@ -42,7 +42,9 @@ relationExpression = do
 
 booleanExpression = do
   relationExpression
+  putStr " "
   oneof [putStr "AND", putStr "OR"]
+  putStr " "
   relationExpression
 
 expression = oneof [factor, booleanExpression]
