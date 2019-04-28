@@ -68,17 +68,7 @@ auto ArithExpression() {
     }
 }
 
-void Expression() {
-    // Generally,
-    //
-    //    cmp src,dst  ZF CF
-    //    dst = src    1  0
-    //    dst < src    0  1
-    //    dst > src    0  0
-    //
-    // Use SETcc to set byte depending on condition flag
-    //
-    // a op b gives b at tos, a at tos-1
+auto Relation() {
     ArithExpression();
     while (scan::sym == '>' || scan::sym == '<' || scan::sym == '=') {
         if (scan::accept('>')) {
@@ -105,6 +95,34 @@ void Expression() {
             printf("    sete %%al\n");
             printf("    movzx %%al,%%eax\n");
             printf("    pushq %%rax\n");
+        }
+    }
+}
+
+void Expression() {
+    Relation();
+    while (scan::sym == 'A' || scan::sym == 'O') {
+        if (scan::accept('A')) {
+            auto l1 = codegen::next_label();
+            auto l2 = codegen::next_label();
+            printf("    popq %%rax\n");
+            printf("    test %%eax,%%eax\n");
+            printf("    jz %s\n", l1); // lhs false, short-circuit
+            Relation();
+            printf("    jmp %s\n", l2); // lhs true, step over false case
+            printf("%s:\n", l1); // in the false case, push zero to stack
+            printf("    sete %%al\n");
+            printf("    movzx %%al,%%eax\n");
+            printf("    xorl %%eax,%%eax\n"); // eax 1 from sete, xor to 0
+            printf("    pushq %%rax\n");
+            printf("%s:\n", l2);
+        } else if (scan::accept('O')) {
+            auto l1 = codegen::next_label();
+            printf("    popq %%rax\n");
+            printf("    test %%eax,%%eax\n");
+            printf("    jnz %s\n", l1); // lhs was true; step over rhs
+            Relation();
+            printf("%s:\n", l1);
         }
     }
 }
