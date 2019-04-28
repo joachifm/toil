@@ -40,7 +40,12 @@ relationExpression = do
   oneof [putStr ">", putStr "<", putStr "="]
   arithExpression
 
-expression = oneof [factor, relationExpression]
+booleanExpression = do
+  relationExpression
+  oneof [putStr "AND", putStr "OR"]
+  relationExpression
+
+expression = oneof [factor, booleanExpression]
 
 assignStmt =
   variable >> putStr " " >> putStr ":=" >> putStr " " >> expression >> putStrLn ""
