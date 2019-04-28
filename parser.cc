@@ -120,6 +120,7 @@ void Expression() {
             auto l1 = cgen::next_label();
             printf("    popq %%rax\n");
             printf("    test %%eax,%%eax\n");
+            printf("    pushq %%rax\n"); // retain lhs
             printf("    jnz %s\n", l1); // lhs was true; step over rhs
             Relation();
             printf("%s:\n", l1);
