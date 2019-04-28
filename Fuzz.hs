@@ -53,6 +53,7 @@ assignStmt =
 whileStmt = do
   putStr "WHILE" >> putStr " " >> expression >> putStrLn ""
   blockStmt
+  putStrLn ""
   putStrLn "ENDWHILE"
 
 ifStmt = do
