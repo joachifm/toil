@@ -68,7 +68,7 @@ auto ArithExpression() {
     }
 }
 
-void Expression() {
+auto Relation() {
     // Generally,
     //
     //    cmp src,dst  ZF CF
@@ -105,6 +105,17 @@ void Expression() {
             printf("    sete %%al\n");
             printf("    movzx %%al,%%eax\n");
             printf("    pushq %%rax\n");
+        }
+    }
+}
+
+void Expression() {
+    Relation();
+    while (scan::sym == 'A' || scan::sym == 'O') {
+        if (scan::accept('A')) {
+            Relation();
+        } else if (scan::accept('O')) {
+            Relation();
         }
     }
 }
