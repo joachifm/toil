@@ -127,7 +127,12 @@ void Expression() {
             printf("    pushq %%rax\n");
             printf("%s:\n", l2);
         } else if (scan::accept('O')) {
+            auto l1 = codegen::next_label();
+            printf("    popq %%rax\n");
+            printf("    test %%eax,%%eax\n");
+            printf("    jnz %s\n", l1); // lhs was true; step over rhs
             Relation();
+            printf("%s:\n", l1);
         }
     }
 }
