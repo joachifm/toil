@@ -69,16 +69,6 @@ auto ArithExpression() {
 }
 
 auto Relation() {
-    // Generally,
-    //
-    //    cmp src,dst  ZF CF
-    //    dst = src    1  0
-    //    dst < src    0  1
-    //    dst > src    0  0
-    //
-    // Use SETcc to set byte depending on condition flag
-    //
-    // a op b gives b at tos, a at tos-1
     ArithExpression();
     while (scan::sym == '>' || scan::sym == '<' || scan::sym == '=') {
         if (scan::accept('>')) {
