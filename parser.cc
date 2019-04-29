@@ -55,9 +55,7 @@ auto ArithExpression() {
         if (scan::accept('+')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
-            printf("    addl %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    addq %%rdx,(%%rsp)\n");
         } else if (scan::accept('-')) {
             Term();
             printf("    popq %%rdx\n");
