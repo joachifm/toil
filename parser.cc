@@ -39,12 +39,12 @@ auto Term() {
             printf("    pushq %%rax\n");
         } else if (scan::accept('/')) {
             Factor();
-            printf("    popq %%rcx\n");
-            printf("    popq %%rax\n");
-            printf("    xorl %%edx,%%edx\n"); // SIGFPE otherwise
-            printf("    div %%ecx\n");
-            printf("    pushq %%rcx\n"); // remainder
-            printf("    pushq %%rax\n"); // quot
+            printf("    popq %%rcx\n"); // divisor
+            printf("    popq %%rax\n"); // dividend
+            printf("    xorl %%edx,%%edx\n"); // dividend stored over rdx:rax, we only use rax
+            printf("    idiv %%ecx\n");
+            printf("    pushq %%rdx\n"); // quotient
+            printf("    pushq %%rax\n"); // result
         }
     }
 }
