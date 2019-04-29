@@ -59,9 +59,7 @@ auto ArithExpression() {
         } else if (scan::accept('-')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
-            printf("    subl %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    subq %%rdx,(%%rsp)\n");
         }
     }
 }
