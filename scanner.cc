@@ -61,6 +61,7 @@ auto match(int c) {
 
 // Advance token if current lexeme matches or abort.
 auto match_string(char const* s) {
+    assert(s);
     if (strcmp(val, s) != 0) error("expected '%s'; got '%s'", s, val);
     get_sym();
 }
@@ -73,6 +74,7 @@ auto accept(int c) {
 
 // Extract name or abort.
 auto get_name(char* out) {
+    assert(out);
     if (sym != 'x') error("expected name");
     strncpy(out, val, token_len_max);
     get_sym();
