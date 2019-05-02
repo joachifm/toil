@@ -1,6 +1,6 @@
 #include "codegen.cc"
-#include "scanner.cc"
 #include "parser.cc"
+#include "scanner.cc"
 
 int main() {
     parser::compile();
