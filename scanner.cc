@@ -74,7 +74,7 @@ auto accept(int c) {
 // Extract name or abort.
 auto get_name(char* out) {
     if (sym != 'x') error("expected name");
-    strcpy(out, val);
+    strncpy(out, val, token_len_max);
     get_sym();
 }
 
