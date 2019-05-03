@@ -1,15 +1,19 @@
 #pragma once
 
 #include "aux.hh"
-#include "labels_gen.h"
 
 namespace codegen {
 
-auto next_label() -> char const* {
-    static unsigned next;
-    if (next > label_count_max - 1) error("exhausted labels");
-    unsigned ind = next++;
-    return labels[ind];
+constexpr size_t label_buf_siz = 11;
+
+#define LABEL(VAR) char VAR[codegen::label_buf_siz]; codegen::next_label(VAR);
+
+auto next_label(char* buf) -> char* {
+    static unsigned next = 1; // 0 means we overflowed
+    if (next == 0) error("exhausted labels");
+    snprintf(buf, label_buf_siz, "L%u", next);
+    ++next;
+    return buf;
 }
 
 } // namespace codegen
