@@ -34,9 +34,9 @@ auto Term() {
         if (scan::accept('*')) {
             Factor();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
+            printf("    movq (%%rsp),%%rax\n");
             printf("    imul %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    movq %%rax,(%%rsp)\n");
         } else if (scan::accept('/')) {
             Factor();
             printf("    popq %%rcx\n"); // divisor
@@ -55,15 +55,11 @@ auto ArithExpression() {
         if (scan::accept('+')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
-            printf("    addl %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    addq %%rdx,(%%rsp)\n");
         } else if (scan::accept('-')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
-            printf("    subl %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    subq %%rdx,(%%rsp)\n");
         }
     }
 }
