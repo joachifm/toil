@@ -70,9 +70,15 @@ blockStmt = oneof [ifStmt, assignStmt]
 varDeclStmt = do
   putStr "VAR" >> putStr " " >> variable >> putStr " " >> putStrLn "INT"
 
+procDeclStmt = do
+  putStr "PROC" >> putStr " " >> variable >> putStrLn ""
+  blockStmt
+  putStrLn "ENDPROC"
+
 programStmt = do
   putStr "PROGRAM" >> putStr " " >> variable >> putStrLn ""
   varDeclStmt
+  procDeclStmt
   blockStmt
   putStrLn "END"
 
