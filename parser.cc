@@ -34,9 +34,9 @@ auto Term() {
         if (scan::accept('*')) {
             Factor();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
+            printf("    movq (%%rsp),%%rax\n");
             printf("    imul %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    movq %%rax,(%%rsp)\n");
         } else if (scan::accept('/')) {
             Factor();
             printf("    popq %%rcx\n"); // divisor
@@ -55,15 +55,11 @@ auto ArithExpression() {
         if (scan::accept('+')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
-            printf("    addl %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    addq %%rdx,(%%rsp)\n");
         } else if (scan::accept('-')) {
             Term();
             printf("    popq %%rdx\n");
-            printf("    popq %%rax\n");
-            printf("    subl %%edx,%%eax\n");
-            printf("    pushq %%rax\n");
+            printf("    subq %%rdx,(%%rsp)\n");
         }
     }
 }
@@ -103,8 +99,8 @@ void Expression() {
     Relation();
     while (scan::sym == 'A' || scan::sym == 'O') {
         if (scan::accept('A')) {
-            auto l1 = cgen::next_label();
-            auto l2 = cgen::next_label();
+            LABEL(l1);
+            LABEL(l2);
             printf("    popq %%rax\n");
             printf("    test %%eax,%%eax\n");
             printf("    jz %s\n", l1); // lhs false, short-circuit
@@ -117,7 +113,7 @@ void Expression() {
             printf("    pushq %%rax\n");
             printf("%s:\n", l2);
         } else if (scan::accept('O')) {
-            auto l1 = cgen::next_label();
+            LABEL(l1);
             printf("    popq %%rax\n");
             printf("    test %%eax,%%eax\n");
             printf("    pushq %%rax\n"); // retain lhs
@@ -131,8 +127,8 @@ void Expression() {
 void Block(); // forward
 
 auto IfElse() {
-    auto l1 = cgen::next_label();
-    auto l2 = cgen::next_label();
+    LABEL(l1);
+    LABEL(l2);
     scan::match('I');
     Expression();                     // condition result top of stack
     printf("    popq %%rax\n");
@@ -149,7 +145,7 @@ auto IfElse() {
 
 auto RepeatUntil() {
     scan::match('R');
-    auto l1 = cgen::next_label();
+    LABEL(l1);
     printf("%s:\n", l1);
     Block();
     scan::match_string("UNTIL");
@@ -160,8 +156,8 @@ auto RepeatUntil() {
 }
 
 auto While() {
-    auto l1 = cgen::next_label();
-    auto l2 = cgen::next_label();
+    LABEL(l1);
+    LABEL(l2);
     scan::match('W');
     printf("%s:\n", l1);
     Expression(); // condition top of stack
@@ -192,7 +188,7 @@ auto ForLoop() {
     // TODO access loop counter in body
 
     printf("    movl $%d,%%ecx\n", n_iter);
-    auto l1 = cgen::next_label();
+    LABEL(l1);
     printf("%s:\n", l1);
     Block();
     printf("    dec %%ecx\n");
@@ -205,7 +201,7 @@ auto DoTimes() {
     auto n_iter = scan::get_number();
     if (n_iter < 1) error("TIMES expects n > 0");
     // TODO unroll if n_iter < threshold
-    auto l1 = cgen::next_label();
+    LABEL(l1);
     // TODO unnecessary push/pop if not nested within another loop
     printf("    pushq %%rcx\n");
     printf("    mov $%d,%%ecx\n", n_iter);
@@ -242,15 +238,52 @@ auto VarDecl() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
 
+    cgen::intern(varnam, cgen::Symtab::KLASS_VAR);
+
     scan::match_string("INT");
 
     printf("%s: .int 0\n", varnam);
+}
+
+void TypSpec() {
+    if (scan::sym == 'x') {
+        char typnam[scan::token_buf_siz];
+        scan::get_name(typnam);
+#if 0
+        auto typ = cgen::resolve(typnam, cgen::Symtab::Klass::KLASS_TYP);
+        if (!typ) error("unbound type: %s", typnam);
+#endif
+    } else if (scan::sym == 'R') {
+        scan::match_string("RECORD");
+        if (scan::sym == '(') {
+            TypSpec();
+            scan::match(')');
+        }
+    } else if (scan::sym == 'A') {
+        scan::match_string("ARRAY");
+        auto len = scan::get_number();
+        TypSpec();
+    } else {
+        error("expected type specifier");
+    }
+}
+
+auto TypDecl() {
+    scan::match_string("TYPE");
+
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+
+    scan::match_string("INT");
 }
 
 auto Program() {
     scan::match_string("PROGRAM");
     char prognam[scan::token_buf_siz];
     scan::get_name(prognam);
+
+    while (scan::sym == 'T')
+        TypDecl();
 
     printf("    .data\n");
     while (scan::sym == 'V')
@@ -281,6 +314,9 @@ auto compile() {
 #ifdef PARSER_TEST_MAIN
 int main() {
     using namespace parser;
+    using namespace cgen;
+
     compile();
+    print_symtab();
 }
 #endif
