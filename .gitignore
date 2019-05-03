@@ -19,3 +19,8 @@ a.out
 out.s
 
 build/
+
+callgrind.out.*
+*.gcov
+*.gcda
+*.gcno
