@@ -213,14 +213,30 @@ auto DoTimes() {
 }
 
 auto Assignment() {
+    fprintf(stderr, "<assignment>\n");
+
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
-    scan::match(':'); scan::match('=');
-    Expression();
-    printf("    popq %s(%%eip)\n", varnam);
+    if (scan::sym == ':') {
+        scan::match(':'); scan::match('=');
+        Expression();
+        printf("    popq %s(%%eip)\n", varnam);
+    } else if (scan::sym == '(') {
+        fprintf(stderr, "<call>\n");
+        fprintf(stderr, "sym: '%c', val: '%s'\n", scan::sym, scan::val);
+        scan::match('(');
+        fprintf(stderr, "sym: '%c', val: '%s'\n", scan::sym, scan::val);
+        scan::match(')');
+        fprintf(stderr, "sym: '%c', val: '%s'\n", scan::sym, scan::val);
+        printf("    jmp %s\n", varnam);
+    } else {
+        error("expected assignment or procedure call");
+    }
 }
 
 void Block() {
+    fprintf(stderr, "<block>\n");
+
     while (scan::sym != 'E' && scan::sym != 'U') {
         if      (scan::sym == 'I') IfElse();
         else if (scan::sym == 'W') While();
@@ -228,8 +244,10 @@ void Block() {
         else if (scan::sym == 'F') ForLoop();
         else if (scan::sym == 'T') DoTimes();
         else if (scan::sym == 'R') RepeatUntil();
-        else error("expected statement");
+        else error("expected statement; got %c (%s)", scan::sym, scan::val);
     }
+
+    scan::match_string("END");
 }
 
 auto VarDecl() {
@@ -243,6 +261,15 @@ auto VarDecl() {
     scan::match_string("INT");
 
     printf("%s: .int 0\n", varnam);
+}
+
+auto ProcDecl() {
+    fprintf(stderr, "<procdecl>\n");
+    scan::match_string("PROC");
+    char varnam[scan::token_buf_siz];
+    scan::get_name(varnam);
+    printf("%s:\n", varnam);
+    Block();
 }
 
 void TypSpec() {
@@ -290,8 +317,13 @@ auto Program() {
         VarDecl();
     printf("\n");
 
-    printf("    .global _start\n");
     printf("    .text\n");
+
+    while (scan::sym == 'P')
+        ProcDecl();
+    printf("\n");
+
+    printf("    .global _start\n");
     printf("_start:\n");
 
     Block();
