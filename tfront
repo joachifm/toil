@@ -1,6 +1,6 @@
 #! /bin/sh
 set -eu
-./do.sh
+CXXFLAGS=${CXXFLAGS:-} ./do.sh
 ./build/bin/toilc > out.s.tmp
 mv out.s.tmp out.s
 gcc -g -nostdlib -no-pie out.s
