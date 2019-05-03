@@ -4,6 +4,8 @@ declare -i expected_fail_count=0
 declare -i fail_count=0
 tmout=5s
 
+export CXXFLAGS="--coverage"
+
 for exe in ./t/compiler/test_* ; do
     [[ -x "$exe" ]] || continue
     echo -n "$exe: " >&2
