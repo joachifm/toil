@@ -103,8 +103,10 @@ void Expression() {
     Relation();
     while (scan::sym == 'A' || scan::sym == 'O') {
         if (scan::accept('A')) {
-            auto l1 = cgen::next_label();
-            auto l2 = cgen::next_label();
+            char l1[cgen::label_buf_siz];
+            char l2[cgen::label_buf_siz];
+            cgen::next_label(l1);
+            cgen::next_label(l2);
             printf("    popq %%rax\n");
             printf("    test %%eax,%%eax\n");
             printf("    jz %s\n", l1); // lhs false, short-circuit
@@ -117,7 +119,8 @@ void Expression() {
             printf("    pushq %%rax\n");
             printf("%s:\n", l2);
         } else if (scan::accept('O')) {
-            auto l1 = cgen::next_label();
+            char l1[cgen::label_buf_siz];
+            cgen::next_label(l1);
             printf("    popq %%rax\n");
             printf("    test %%eax,%%eax\n");
             printf("    pushq %%rax\n"); // retain lhs
@@ -131,8 +134,10 @@ void Expression() {
 void Block(); // forward
 
 auto IfElse() {
-    auto l1 = cgen::next_label();
-    auto l2 = cgen::next_label();
+    char l1[cgen::label_buf_siz];
+    char l2[cgen::label_buf_siz];
+    cgen::next_label(l1);
+    cgen::next_label(l2);
     scan::match('I');
     Expression();                     // condition result top of stack
     printf("    popq %%rax\n");
@@ -149,7 +154,8 @@ auto IfElse() {
 
 auto RepeatUntil() {
     scan::match('R');
-    auto l1 = cgen::next_label();
+    char l1[cgen::label_buf_siz];
+    cgen::next_label(l1);
     printf("%s:\n", l1);
     Block();
     scan::match_string("UNTIL");
@@ -160,8 +166,10 @@ auto RepeatUntil() {
 }
 
 auto While() {
-    auto l1 = cgen::next_label();
-    auto l2 = cgen::next_label();
+    char l1[cgen::label_buf_siz];
+    char l2[cgen::label_buf_siz];
+    cgen::next_label(l1);
+    cgen::next_label(l2);
     scan::match('W');
     printf("%s:\n", l1);
     Expression(); // condition top of stack
@@ -192,7 +200,8 @@ auto ForLoop() {
     // TODO access loop counter in body
 
     printf("    movl $%d,%%ecx\n", n_iter);
-    auto l1 = cgen::next_label();
+    char l1[cgen::label_buf_siz];
+    cgen::next_label(l1);
     printf("%s:\n", l1);
     Block();
     printf("    dec %%ecx\n");
@@ -205,7 +214,8 @@ auto DoTimes() {
     auto n_iter = scan::get_number();
     if (n_iter < 1) error("TIMES expects n > 0");
     // TODO unroll if n_iter < threshold
-    auto l1 = cgen::next_label();
+    char l1[cgen::label_buf_siz];
+    cgen::next_label(l1);
     // TODO unnecessary push/pop if not nested within another loop
     printf("    pushq %%rcx\n");
     printf("    mov $%d,%%ecx\n", n_iter);
