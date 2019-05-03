@@ -73,3 +73,9 @@ values.
 : t/compiler/test_basic_arith.sh: ok
 : t/compiler/test_basic_assignment.sh: ok
 : t/compiler/test_basic_if_else.sh: ok
+* References
+
+- Crenshaw, J. (1995), Let's build a compiler!
+- Ghuloum A. (2006), An incremental approach to compiler construction
+- Holub, A. (1990), Compiler design in C
+- Wirth, N. (2005), Compiler construction
