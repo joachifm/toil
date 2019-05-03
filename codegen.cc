@@ -77,6 +77,25 @@ auto print_symtab() {
     }
 }
 
+struct Item {
+    enum Kind : unsigned {
+        KIND_CON,
+        KIND_REG,
+        KIND_VAR,
+    } t;
+
+    union {
+        // when KIND_CON
+        struct { int val; } con;
+
+        // when KIND_REG
+        struct { int a; int b; } reg;
+
+        // when KIND_VAR
+        struct { int adr; } var;
+    };
+};
+
 } // namespace codegen
 
 namespace cgen = codegen;
