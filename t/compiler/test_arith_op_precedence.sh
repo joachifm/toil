@@ -8,10 +8,12 @@ PROGRAM multivar
 VAR x INT
 VAR y INT
 VAR z INT
+VAR a INT
 
 x := 1 + 2 * 3
-y := ( 1 + 2 ) * 3
-z := ( 1 + 2 ) * ( 1 + 2)
+y := (1 + 2) * 3
+z := (1 + 2) * (1 + 2)
+a := ((2 + 2) * (2 + 2))/2
 
 END
 EOF
@@ -19,3 +21,4 @@ EOF
 gdb -batch -ex 'break _end_of_program' -ex 'run' -ex 'p (int)x' a.out | grep -q '$1 = 7$'
 gdb -batch -ex 'break _end_of_program' -ex 'run' -ex 'p (int)y' a.out | grep -q '$1 = 9$'
 gdb -batch -ex 'break _end_of_program' -ex 'run' -ex 'p (int)z' a.out | grep -q '$1 = 9$'
+gdb -batch -ex 'break _end_of_program' -ex 'run' -ex 'p (int)a' a.out | grep -q '$1 = 8$'

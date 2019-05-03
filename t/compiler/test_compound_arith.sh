@@ -7,7 +7,7 @@ PROGRAM compoundarith
 
 VAR x INT
 
-x := ( ( ( 2 + 2 ) - ( 1 + 1 ) ) + 1 ) - 0
+x := (((2 + 2) - (1 + 1)) + 1) - 0
 
 END
 EOF
