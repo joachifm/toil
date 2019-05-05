@@ -24,3 +24,5 @@
 
     exit(ecode);
 }
+
+#define STREQ(S1, S2) (strcmp(S1, S2) == 0)
