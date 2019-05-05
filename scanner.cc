@@ -62,7 +62,7 @@ auto match(int c) {
 // Advance token if current lexeme matches or abort.
 auto match_string(char const* s) {
     assert(s);
-    if (strcmp(val, s) != 0) error("expected '%s'; got '%s'", s, val);
+    if (!STREQ(val, s)) error("expected '%s'; got '%s'", s, val);
     get_sym();
 }
 
