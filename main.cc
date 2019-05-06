@@ -1,7 +1,4 @@
-#include "codegen.cc"
-#include "parser.cc"
-#include "scanner.cc"
-#include "symtab.cc"
+#include "parser.hh"
 
 int main() {
     parser::compile();
