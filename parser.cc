@@ -7,6 +7,7 @@
 #include "aux.hh"
 #include "codegen.cc"
 #include "scanner.cc"
+#include "symtab.cc"
 
 namespace parser {
 
@@ -19,6 +20,10 @@ auto Factor() {
     } else if (scan::sym == 'x') {
         char varnam[scan::token_buf_siz];
         scan::get_name(varnam);
+#ifndef TEST
+        if (!stab::resolve(varnam, stab::Klass::var))
+            error("unbound variable: %s", varnam);
+#endif
         printf("    pushq %s(%%eip)\n", varnam);
     } else if (scan::accept('(')) {
         while (!scan::accept(')'))
@@ -220,10 +225,18 @@ auto Assignment() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
     if (scan::sym == ':') {
+#ifndef TEST
+        if (!stab::resolve(varnam, stab::Klass::var))
+            error("assigning to undeclared variable: %s", varnam);
+#endif
         scan::match(':'); scan::match('=');
         Expression();
         printf("    popq %s(%%eip)\n", varnam);
     } else if (scan::sym == '(') {
+#ifndef TEST
+        if (!stab::resolve(varnam, stab::Klass::proc))
+            error("call to undeclared procedure: %s", varnam);
+#endif
         scan::match('(');
         scan::match(')');
         printf("    call %s\n", varnam);
@@ -250,6 +263,8 @@ auto VarDecl() {
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
 
+    stab::intern(varnam, stab::Klass::var);
+
     scan::match_string("INT");
 
     printf("%s: .int 0\n", varnam);
@@ -259,6 +274,7 @@ auto ProcDecl() {
     scan::match_string("PROC");
     char varnam[scan::token_buf_siz];
     scan::get_name(varnam);
+    stab::intern(varnam, stab::Klass::proc);
     printf("%s:\n", varnam);
     Block();
     printf("    ret\n");
@@ -303,7 +319,7 @@ auto compile() {
 
 #ifdef PARSER_TEST_MAIN
 int main() {
-    using namespace parser;
-    compile();
+    parser::compile();
+    stab::print_symtab();
 }
 #endif

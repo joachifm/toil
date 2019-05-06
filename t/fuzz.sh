@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-CXXFLAGS="--coverage" ./do.sh
+CPPFLAGS="-DTEST" CXXFLAGS="--coverage" ./do.sh
 install -d build/objs
 ghc -hidir build/objs -odir build/objs -o build/bin/fuzz -O2 --make Fuzz.hs
 
