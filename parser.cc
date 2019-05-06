@@ -12,7 +12,7 @@
 
 namespace parser {
 
-void Expression();
+auto Expression() -> void; // forward
 
 auto Factor() {
     if (scan::sym == '#') {
@@ -105,7 +105,7 @@ auto Relation() {
     }
 }
 
-void Expression() {
+auto Expression() -> void {
     Relation();
     while (scan::sym == 'A' || scan::sym == 'O') {
         if (scan::accept('A')) {
@@ -134,7 +134,7 @@ void Expression() {
     }
 }
 
-void Block(); // forward
+auto Block() -> void; // forward
 
 auto IfElse() {
     auto l1 = cgen::next_label();
@@ -246,7 +246,7 @@ auto Assignment() {
     }
 }
 
-void Block() {
+auto Block() -> void {
     while (scan::sym != 'E' && scan::sym != 'U') {
         if      (scan::sym == 'I') IfElse();
         else if (scan::sym == 'W') While();
