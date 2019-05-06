@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aux.hh"
+#include "codegen.hh"
 
 namespace codegen {
 
@@ -13,5 +14,3 @@ auto next_label() -> char const* {
 }
 
 } // namespace codegen
-
-namespace cgen = codegen;

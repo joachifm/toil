@@ -7,21 +7,20 @@
 #include <cstring>
 
 #include "aux.hh"
+#include "scanner.hh"
 
-namespace scan {
+namespace scanner {
 
-constexpr size_t token_len_max = 15;
-constexpr size_t token_buf_siz = token_len_max + 1;
-
-int look; // Lookahead
-int sym; // Token code
-char val[token_buf_siz]; // Token value (aka. the lexeme)
-size_t len; // Token value length
+// extern
+int look;
+int sym;
+char val[token_buf_siz];
+size_t len;
 
 // Post-conditions:
 // - val, len, and sym describe the current token
 // - look holds first char not part of the current token
-auto get_sym() {
+auto get_sym() -> void {
     assert(look != EOF);
 
     while (isspace(look)) look = getchar();
@@ -54,26 +53,26 @@ auto get_sym() {
 }
 
 // Advance token if current sym matches or abort.
-auto match(int c) {
+auto match(int c) -> void {
     if (sym != c) error("expected sym '%c'; got '%c' (val='%s')", c, sym, val);
     get_sym();
 }
 
 // Advance token if current lexeme matches or abort.
-auto match_string(char const* s) {
+auto match_string(char const* s) -> void {
     assert(s);
     if (!STREQ(val, s)) error("expected '%s'; got '%s'", s, val);
     get_sym();
 }
 
-auto accept(int c) {
+auto accept(int c) -> bool {
     if (sym != c) return false;
     get_sym();
     return true;
 }
 
 // Extract name or abort.
-auto get_name(char* out) {
+auto get_name(char* out) -> void {
     assert(out);
     if (sym != 'x') error("expected name");
     strcpy(out, val);
@@ -81,18 +80,18 @@ auto get_name(char* out) {
 }
 
 // Extract number or abort.
-auto get_number() {
+auto get_number() -> int {
     if (sym != '#') error("expected number");
     auto num = atoi(val);
     get_sym();
     return num;
 }
 
-auto is_eof() {
+auto is_eof() -> bool {
     return look == EOF;
 }
 
-auto init() {
+auto init() -> void {
     look = getchar();
     get_sym();
 }
