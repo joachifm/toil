@@ -1,9 +1,9 @@
 #pragma once
 
+#include <cerrno>
+#include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
-#include <cstdarg>
-#include <cerrno>
 #include <cstring>
 
 [[noreturn]] static void error(char const* fmt, ...) {
