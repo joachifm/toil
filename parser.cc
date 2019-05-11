@@ -311,7 +311,7 @@ auto Program() {
     printf("    syscall\n");
 }
 
-auto compile() {
+auto compile() -> void {
     scan::init();
     Program();
 }

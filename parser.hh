@@ -2,6 +2,6 @@
 
 namespace parser {
 
-auto compile();
+auto compile() -> void;
 
 }
