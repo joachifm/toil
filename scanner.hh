@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef> // size_t
+
 namespace scanner {
 
 constexpr size_t token_len_max = 15;
