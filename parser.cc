@@ -10,7 +10,7 @@
 #include "scanner.hh"
 #include "symtab.hh"
 
-namespace parser {
+namespace {
 
 auto Expression() -> void; // forward
 
@@ -310,6 +310,10 @@ auto Program() {
     printf("    xorl %%edi,%%edi\n");
     printf("    syscall\n");
 }
+
+} // namespace
+
+namespace parser {
 
 auto compile() -> void {
     scan::init();
