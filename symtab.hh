@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scanner.hh"
+
 namespace symtab {
 
 enum class Klass {
