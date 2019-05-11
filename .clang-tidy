@@ -1,11 +1,10 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*'
+Checks:          '-*,clang-analyzer-core.*,clang-analyzer-cplusplus.*,clang-analyzer-deadcode.DeadStores,clang-analyzer-nullability.*,clang-analyzer-optin.performance.*,clang-analyzer-optin.portability.*,clang-analyzer-security.*,clang-analyzer-unix.*,misc-*,modernize-*,-modernize-avoid-c-arrays,performance-*,portability-*'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
-User:            joachifm
-CheckOptions:    
+CheckOptions:
   - key:             cert-dcl16-c.NewSuffixes
     value:           'L;LL;LU;LLU'
   - key:             cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
@@ -31,4 +30,3 @@ CheckOptions:
   - key:             modernize-use-nullptr.NullMacros
     value:           'NULL'
 ...
-
