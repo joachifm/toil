@@ -75,7 +75,7 @@ auto accept(int c) -> bool {
 auto get_name(char* out) -> void {
     assert(out);
     if (sym != 'x') error("expected name");
-    strcpy(out, val);
+    strncpy(out, val, sizeof(val)-1);
     get_sym();
 }
 
