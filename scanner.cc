@@ -97,6 +97,10 @@ auto is_eof() -> bool {
     return look == EOF;
 }
 
+[[noreturn]] auto expected(char const* what) -> void {
+    error("expected %s; got '%c' (tok='%s')", what, sym, val);
+}
+
 auto init() -> void {
     look = getchar();
     get_sym();

@@ -30,7 +30,7 @@ auto Factor() {
         while (!scan::accept(')'))
             Expression();
     } else {
-        error("expected factor, got %c", scan::sym);
+        scan::expected("factor");
     }
 }
 
@@ -242,7 +242,7 @@ auto Assignment() {
         scan::match(')');
         printf("    call %s\n", varnam);
     } else {
-        error("expected assignment or procedure call");
+        scan::expected("assignment or procedure call");
     }
 }
 
@@ -254,7 +254,7 @@ auto Block() -> void {
         else if (scan::sym == 'F') ForLoop();
         else if (scan::sym == 'T') DoTimes();
         else if (scan::sym == 'R') RepeatUntil();
-        else error("expected statement; got %c", scan::sym);
+        else scan::expected("statement");
     }
 }
 

@@ -21,6 +21,8 @@ auto is_eof() -> bool;
 auto match(int c) -> void;
 auto match_string(char const* s) -> void;
 
+[[noreturn]] auto expected(char const* what) -> void;
+
 }
 
 namespace scan = scanner;
