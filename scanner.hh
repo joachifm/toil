@@ -11,7 +11,7 @@ extern int sym; // Token code
 
 auto init() -> void;
 
-auto get_name(char* out) -> void;
+auto get_name(char (&out)[token_buf_siz]) -> void;
 auto get_number() -> int;
 auto get_sym() -> void;
 
