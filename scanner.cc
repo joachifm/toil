@@ -11,11 +11,14 @@
 
 namespace scanner {
 
+namespace {
+int look; // Lookahead
+char val[token_buf_siz]; // Token value (aka. the lexeme)
+size_t len; // Token value length
+} // namespace
+
 // extern
-int look;
 int sym;
-char val[token_buf_siz];
-size_t len;
 
 // Post-conditions:
 // - val, len, and sym describe the current token
@@ -50,6 +53,8 @@ auto get_sym() -> void {
         val[1] = '\0';
         look = getchar();
     }
+
+    assert(strlen(val) == len);
 }
 
 // Advance token if current sym matches or abort.
@@ -72,10 +77,11 @@ auto accept(int c) -> bool {
 }
 
 // Extract name or abort.
-auto get_name(char* out) -> void {
+auto get_name(char (&out)[token_buf_siz]) -> void {
+    static_assert(sizeof(out) == token_buf_siz);
     assert(out);
     if (sym != 'x') error("expected name");
-    strncpy(out, val, sizeof(val)-1);
+    strcpy(out, val); // trust that val is always 0-terminated
     get_sym();
 }
 

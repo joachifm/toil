@@ -254,7 +254,7 @@ auto Block() -> void {
         else if (scan::sym == 'F') ForLoop();
         else if (scan::sym == 'T') DoTimes();
         else if (scan::sym == 'R') RepeatUntil();
-        else error("expected statement; got %c (%s)", scan::sym, scan::val);
+        else error("expected statement; got %c", scan::sym);
     }
 }
 
