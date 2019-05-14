@@ -50,6 +50,8 @@ auto get_sym() -> void {
         val[1] = '\0';
         look = getchar();
     }
+
+    assert(strlen(val) == len);
 }
 
 // Advance token if current sym matches or abort.
