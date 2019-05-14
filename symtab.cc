@@ -51,6 +51,7 @@ auto intern(char const* name, Klass klass) -> Symtab* {
     Symtab* ent = &symtab_slab[slot];
 
     strncpy(ent->name, name, scan::token_buf_siz - 1);
+    ent->name[scan::token_buf_siz - 1] = '\0';
     ent->klass = klass;
     ent->level = level;
 
