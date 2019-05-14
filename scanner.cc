@@ -11,11 +11,14 @@
 
 namespace scanner {
 
+namespace {
+int look; // Lookahead
+char val[token_buf_siz]; // Token value (aka. the lexeme)
+size_t len; // Token value length
+} // namespace
+
 // extern
-int look;
 int sym;
-char val[token_buf_siz];
-size_t len;
 
 // Post-conditions:
 // - val, len, and sym describe the current token
