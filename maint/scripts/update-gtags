@@ -18,6 +18,7 @@ fi
 # tags
 if type -p ctags &>/dev/null ; then
     ctags -L gtags.files -f tags
+    ctags -L gtags.files -e -f TAGS
 fi
 
 # cscope
