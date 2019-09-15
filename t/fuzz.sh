@@ -4,7 +4,7 @@ set -euo pipefail
 
 CPPFLAGS="-DTEST" CXXFLAGS="--coverage" ./do.sh
 install -d build/objs
-ghc -hidir build/objs -odir build/objs -o build/bin/fuzz -O2 --make Fuzz.hs
+ghc -hidir build/objs -odir build/objs -package random -o build/bin/fuzz -O2 --make Fuzz.hs
 
 workdir=$(mktemp -d)
 
