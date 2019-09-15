@@ -24,3 +24,5 @@ callgrind.out.*
 *.gcov
 *.gcda
 *.gcno
+
+result
